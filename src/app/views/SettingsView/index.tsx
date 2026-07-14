@@ -20,6 +20,7 @@ import { config } from '@app/controller/config';
 import { t, LanguageT } from '@app/i18n';
 
 import { Toast, ToastRefI } from '@app/components/Toast';
+import { Hint } from '@app/components/Hint';
 import { AdvancedSettingsView } from '@app/views/AdvancedSettingsView';
 import { ServerSettingsView } from '@app/views/ServerSettingsView';
 import { ProfileDetailView } from '@app/views/ProfileDetailView';
@@ -466,11 +467,7 @@ export const SettingsView = (props: ViewProps) => {
       </Panel>
 
       <Panel>
-        <div
-          title={t(
-            'Preview the generated JSON in a sidebar: syntax highlighting, search, copy button and stats. Click Update to refresh.'
-          )}
-        >
+        <div className={styles.hintAnchor}>
           <PanelHeader
             title={t('Show output')}
             onClick={handleShowOutput}
@@ -481,16 +478,24 @@ export const SettingsView = (props: ViewProps) => {
               },
             ]}
           />
+          <Hint
+            className={styles.hintInHeader}
+            text={t(
+              'Preview the generated JSON in a sidebar: syntax highlighting, search, copy button and stats. Click Update to refresh.'
+            )}
+          />
         </div>
       </Panel>
 
       <Panel>
         <Stack hasLeftRightPadding>
-          <div
-            title={t(
+          <div className={styles.hintAnchor}>
+          <Hint
+            className={styles.hintInDropdownLabel}
+            text={t(
               'Color format for exported values: HEX, RGBA, HSLA (CSS or object syntax), sRGB/HSL/OKLCH per the DTCG spec.'
             )}
-          >
+          />
           <Dropdown
             label={t('Color mode')}
             value={JSONsettingsConfig.colorMode}
@@ -556,12 +561,14 @@ export const SettingsView = (props: ViewProps) => {
       </Panel>
 
       <Panel>
-        <div
-          title={t(
-            'Export Figma styles (typography, grids, effects, colors) into the JSON. Each group can be renamed.'
-          )}
-        >
+        <div className={styles.hintAnchor}>
           <PanelHeader title={t('Include styles')} isActive />
+          <Hint
+            className={`${styles.hintInHeader} ${styles.hintInHeaderBare}`}
+            text={t(
+              'Export Figma styles (typography, grids, effects, colors) into the JSON. Each group can be renamed.'
+            )}
+          />
         </div>
 
         <Stack hasLeftRightPadding={false} hasTopBottomPadding gap={2}>
@@ -624,11 +631,13 @@ export const SettingsView = (props: ViewProps) => {
       }) && (
         <Panel>
           <Stack hasLeftRightPadding>
-            <div
-              title={t(
+            <div className={styles.hintAnchor}>
+            <Hint
+              className={styles.hintInDropdownLabel}
+              text={t(
                 'Where to put styles in the JSON: as separate root collections (Keep separate) or inside a chosen variable collection.'
               )}
-            >
+            />
             <Dropdown
               label={t('Add styles to')}
               value={JSONsettingsConfig.storeStyleInCollection}
@@ -666,24 +675,23 @@ export const SettingsView = (props: ViewProps) => {
 
       <Panel>
         <Stack hasLeftRightPadding>
-          <div
-            title={t(
-              'Align output with the DTCG 2025.10 spec: $-prefixed keys ($value, $type), dimensions as objects, Figma-only types kept in $extensions.'
-            )}
+          <Toggle
+            id="use-dtcg"
+            checked={JSONsettingsConfig.useDTCG}
+            onChange={(checked: boolean) => {
+              setJSONsettingsConfig({
+                ...JSONsettingsConfig,
+                useDTCG: checked,
+              });
+            }}
           >
-            <Toggle
-              id="use-dtcg"
-              checked={JSONsettingsConfig.useDTCG}
-              onChange={(checked: boolean) => {
-                setJSONsettingsConfig({
-                  ...JSONsettingsConfig,
-                  useDTCG: checked,
-                });
-              }}
-            >
-              <Text>DTCG 2025.10 format</Text>
-            </Toggle>
-          </div>
+            <Text>DTCG 2025.10 format</Text>
+            <Hint
+              text={t(
+                'Align output with the DTCG 2025.10 spec: $-prefixed keys ($value, $type), dimensions as objects, Figma-only types kept in $extensions.'
+              )}
+            />
+          </Toggle>
         </Stack>
       </Panel>
 
@@ -711,11 +719,7 @@ export const SettingsView = (props: ViewProps) => {
       </Panel>
 
       <Panel>
-        <div
-          title={t(
-            'Connect JSONBin, GitHub, GitHub PR, GitLab or a custom URL and push the generated JSON directly. Multiple servers are pushed one by one.'
-          )}
-        >
+        <div className={styles.hintAnchor}>
         <PanelHeader
           ref={serversHeaderRef}
           title={t('Push to server')}
@@ -744,6 +748,12 @@ export const SettingsView = (props: ViewProps) => {
               onClick: handleShowServersOverlayList,
             },
           ]}
+        />
+        <Hint
+          className={styles.hintInHeader}
+          text={t(
+            'Connect JSONBin, GitHub, GitHub PR, GitLab or a custom URL and push the generated JSON directly. Multiple servers are pushed one by one.'
+          )}
         />
         </div>
 

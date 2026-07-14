@@ -3,6 +3,7 @@ import styles from './styles.module.scss';
 
 import { Panel, PanelHeader, Stack, Text, Toggle } from 'react-figma-ui/ui';
 import { t } from '@app/i18n';
+import { Hint } from '@app/components/Hint';
 
 interface ViewProps {
   JSONsettingsConfig: JSONSettingsConfigI;
@@ -148,15 +149,14 @@ export const AdvancedSettingsView = ({
         {toggleItems.map((item) => (
           <Panel key={item.id}>
             <Stack hasLeftRightPadding>
-              <div title={item.hint}>
-                <Toggle
-                  id={item.id}
-                  checked={item.checked}
-                  onChange={item.onChange}
-                >
-                  <Text>{item.label}</Text>
-                </Toggle>
-              </div>
+              <Toggle
+                id={item.id}
+                checked={item.checked}
+                onChange={item.onChange}
+              >
+                <Text>{item.label}</Text>
+                <Hint text={item.hint} />
+              </Toggle>
             </Stack>
           </Panel>
         ))}

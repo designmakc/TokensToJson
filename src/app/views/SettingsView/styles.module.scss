@@ -86,3 +86,27 @@
   cursor: ns-resize;
   user-select: none;
 }
+
+.hintAnchor {
+  position: relative;
+}
+
+.hintInHeader {
+  position: absolute;
+  right: 44px;
+  // no transform here — a transformed ancestor would become the containing
+  // block for the bubble's position:fixed and break its viewport coords
+  top: calc(50% - 6px);
+  z-index: 2;
+}
+
+.hintInHeaderBare {
+  right: 16px;
+}
+
+.hintInDropdownLabel {
+  position: absolute;
+  right: 0;
+  top: 1px;
+  z-index: 2;
+}
