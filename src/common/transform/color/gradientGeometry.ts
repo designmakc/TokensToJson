@@ -30,7 +30,9 @@ const buildGeometry = (
     kind,
     start: { x: round(start.x), y: round(start.y) },
     end: { x: round(end.x), y: round(end.y) },
-    cssAngle: round(cssAngle),
+    // second % 360: floating point can land on 359.99999…, which rounds
+    // up to 360 — canonical form is 0
+    cssAngle: round(cssAngle) % 360,
   };
 };
 

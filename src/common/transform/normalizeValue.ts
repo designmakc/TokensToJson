@@ -13,6 +13,9 @@ interface PropsI {
   includeValueStringKeyToAlias: boolean;
   usePercentageOpacity: boolean;
   omitCollectionNames?: boolean;
+  // Name-based category refinement ("Refine types" setting) — the value
+  // must be formatted to match the refined $type, not as a dimension
+  refinedType?: TokenCategoryRefineTypeT;
 }
 
 export const normalizeValue = async (props: PropsI, resolver: IResolver) => {
@@ -25,6 +28,7 @@ export const normalizeValue = async (props: PropsI, resolver: IResolver) => {
     includeValueStringKeyToAlias,
     usePercentageOpacity,
     omitCollectionNames = false,
+    refinedType,
   } = props;
 
   // console.log("variableValue", variableValue);
@@ -56,12 +60,21 @@ export const normalizeValue = async (props: PropsI, resolver: IResolver) => {
       } else {
         return Number(variableValue) / 100;
       }
-    } else {
-      return makeDimension(
-        new Decimal(variableValue).toDecimalPlaces(6).toNumber(),
-        useDTCG
-      );
     }
+
+    // A precise scope (branches above) wins over the name-based refinement
+    if (refinedType === 'number' || refinedType === 'fontWeight') {
+      return new Decimal(variableValue).toDecimalPlaces(6).toNumber();
+    }
+    if (refinedType === 'duration') {
+      const duration = new Decimal(variableValue).toDecimalPlaces(6).toNumber();
+      return useDTCG ? { value: duration, unit: 'ms' } : `${duration}ms`;
+    }
+
+    return makeDimension(
+      new Decimal(variableValue).toDecimalPlaces(6).toNumber(),
+      useDTCG
+    );
   }
 
   return variableValue;

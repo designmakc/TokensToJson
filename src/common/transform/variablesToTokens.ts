@@ -75,6 +75,26 @@ export const variablesToTokens = async (
     // console.log("collectionObject", collectionObj
     // console.log("collection", collectionObject);
 
+    const categoriesConfig = config.tokenCategories;
+    const categoryMatch = categoriesConfig?.isEnabled
+      ? resolveTokenCategory(
+          variable.name,
+          categoriesConfig.rules?.length
+            ? categoriesConfig.rules
+            : DEFAULT_CATEGORY_RULES
+        )
+      : null;
+
+    // Name-based type refinement (opt-in). Only generic FLOAT is refined —
+    // a precise scope (FONT_WEIGHT/OPACITY) already produced a better type
+    // and the scope is more trustworthy than the name.
+    const refinedType =
+      categoriesConfig?.refineTypes &&
+      categoryMatch?.refineType &&
+      variable.resolvedType === 'FLOAT'
+        ? categoryMatch.refineType
+        : undefined;
+
     // get values by mode
     const modes = variable.valuesByMode;
 
@@ -89,6 +109,7 @@ export const variablesToTokens = async (
           includeValueStringKeyToAlias,
           usePercentageOpacity,
           omitCollectionNames,
+          refinedType,
         },
         resolver
       );
@@ -126,26 +147,8 @@ export const variablesToTokens = async (
       usePercentageOpacity
     );
 
-    const categoriesConfig = config.tokenCategories;
-    const categoryMatch = categoriesConfig?.isEnabled
-      ? resolveTokenCategory(
-          variable.name,
-          categoriesConfig.rules?.length
-            ? categoriesConfig.rules
-            : DEFAULT_CATEGORY_RULES
-        )
-      : null;
-
-    // Name-based type refinement (opt-in). Only generic FLOAT "dimension"
-    // is refined — a precise scope (FONT_WEIGHT/OPACITY) already produced
-    // a better type and the scope is more trustworthy than the name.
-    if (
-      categoriesConfig?.refineTypes &&
-      categoryMatch?.refineType &&
-      variable.resolvedType === 'FLOAT' &&
-      tokenType === 'dimension'
-    ) {
-      tokenType = categoryMatch.refineType;
+    if (refinedType && tokenType === 'dimension') {
+      tokenType = refinedType;
     }
 
     // ALL_SCOPES is a Figma-picker workaround, not semantics — never export it

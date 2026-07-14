@@ -181,7 +181,34 @@ describe('variablesToTokens token categories', () => {
       } as ExportSettingsI,
       resolver
     );
-    expect(on['core']['opacity']['disabled'].$type).toBe('number');
+    const refined = on['core']['opacity']['disabled'];
+    expect(refined.$type).toBe('number');
+    // refined value must be a bare number, not a {value, unit} dimension
+    expect(refined.$value).toBe(0.4);
+  });
+
+  test('refined duration gets a ms duration object, not px', async () => {
+    const durationVar = [
+      {
+        ...(variables[0] as object),
+        name: 'motion/duration/fast',
+        valuesByMode: { m1: 150 },
+        id: 'v11',
+      },
+    ] as unknown as Variable[];
+
+    const tokens = await variablesToTokens(
+      durationVar,
+      collections,
+      {
+        ...categoriesOn,
+        tokenCategories: { isEnabled: true, refineTypes: true, rules: [] },
+      } as ExportSettingsI,
+      resolver
+    );
+    const fast = tokens['core']['motion']['duration']['fast'];
+    expect(fast.$type).toBe('duration');
+    expect(fast.$value).toStrictEqual({ value: 150, unit: 'ms' });
   });
 
   test('disabled feature leaves tokens untouched', async () => {

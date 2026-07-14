@@ -75,6 +75,16 @@ describe('getGradientGeometry', () => {
     expect(geometry.cssAngle).toBeCloseTo(135, 1);
   });
 
+  test('bottom-to-top never emits 360 (canonical 0)', () => {
+    // real-world Figma matrix for a bottom-to-top gradient; float error
+    // puts the raw angle at 359.9999…
+    const geometry = getGradientGeometry(
+      linear(matrixFromHandles({ x: 0.5, y: 1.0000001 }, { x: 0.5, y: 0 }))
+    );
+    expect(geometry.cssAngle).toBeGreaterThanOrEqual(0);
+    expect(geometry.cssAngle).toBeLessThan(360);
+  });
+
   test('degenerate matrix falls back to horizontal', () => {
     const geometry = getGradientGeometry(
       linear([
