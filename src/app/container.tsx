@@ -252,6 +252,9 @@ const Container = () => {
       // includes the preview pane and doesn't represent SettingsView height.
       if (isCodePreviewOpen) return;
 
+      // A detached/empty node reports 0 — never collapse the plugin window
+      if (height <= 0) return;
+
       setContentHeight(height);
       setFrameHeight(height);
 
@@ -392,8 +395,7 @@ const Container = () => {
   };
 
   return (
-    // key remounts the tree on language switch so every t() re-evaluates
-    <div ref={wrapperRef} className={styles.container} key={language}>
+    <div ref={wrapperRef} className={styles.container}>
       {renderView()}
       {isCodePreviewOpen && (
         <CodePreviewView generatedTokens={generatedTokens} />
