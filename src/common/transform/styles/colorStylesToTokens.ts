@@ -5,7 +5,7 @@ import { getTokenKeyName } from '@common/transform/getTokenKeyName';
 import { getAliasVariableName } from '@common/transform/getAliasVariableName';
 import { IResolver } from '@common/resolver';
 
-const GRADIENT_EXTENSION_NAMESPACE = 'net.genlab.gradient';
+const GRADIENT_EXTENSION_NAMESPACE = 'io.github.designmakc.gradient';
 
 // Design-system contract checks. They only warn — export always proceeds.
 const validateGradientStyle = (
