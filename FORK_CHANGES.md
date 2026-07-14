@@ -78,6 +78,7 @@
 
 typography / grids / shadows / blur, import-режим (JSON → Figma), CLI-функциональность — работают как в upstream.
 
+
 ## Downstream
 
 Style Dictionary: N сборок (по бренду), трансформы `gradient/css` и `gradient/rn` читают `$extensions['tokens-to-json'].gradient` — контракт и примеры в §7 брифа. Оба трансформа требуют `transitive: true`; `expand` для `gradient` не включать.
