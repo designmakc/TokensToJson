@@ -8,7 +8,7 @@
 ### Геометрия градиентов (GAP-1)
 
 `src/common/transform/color/gradientGeometry.ts` — инверсия `gradientTransform` → handles + CSS-угол.
-Гео пишется в `$extensions['net.genlab.gradient']`, `$value` остаётся чистым DTCG (только стопы):
+Гео пишется в `$extensions['net.brand.gradient']`, `$value` остаётся чистым DTCG (только стопы):
 
 ```json
 "$extensions": {
@@ -66,6 +66,4 @@
 
 typography / grids / shadows / blur, import-режим (JSON → Figma), CLI-функциональность — работают как в upstream.
 
-## Downstream
 
-Style Dictionary: N сборок (по бренду), трансформы `gradient/css` и `gradient/rn` читают `$extensions['net.genlab.gradient']` — контракт и примеры в §7 брифа. Оба трансформа требуют `transitive: true`; `expand` для `gradient` не включать.
