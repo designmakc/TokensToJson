@@ -4,11 +4,14 @@ import styles from './styles.module.scss';
 interface HintProps {
   text: string;
   className?: string;
+  /** Set when the hint sits inside a Toggle label — lifts it above the
+   *  invisible checkbox input that otherwise steals hover. */
+  inline?: boolean;
 }
 
 // ⓘ icon with a CSS-only tooltip bubble. The bubble is position:fixed so it
 // never gets clipped by panel overflow; on hover we clamp it to the window.
-export const Hint = ({ text, className }: HintProps) => {
+export const Hint = ({ text, className, inline }: HintProps) => {
   const iconRef = useRef<HTMLSpanElement | null>(null);
   const bubbleRef = useRef<HTMLSpanElement | null>(null);
   const [bubbleStyle, setBubbleStyle] = useState<React.CSSProperties>({});
@@ -39,10 +42,16 @@ export const Hint = ({ text, className }: HintProps) => {
   return (
     <span
       ref={iconRef}
-      className={`${styles.hint} ${className || ''}`}
+      className={`${styles.hint} ${inline ? styles.inline : ''} ${
+        className || ''
+      }`}
       onMouseEnter={positionBubble}
-      // settings rows are clickable — ⓘ is hover-only, don't toggle the row
-      onClick={(event) => event.stopPropagation()}
+      // settings rows are clickable and hints may sit inside a <label> —
+      // ⓘ is hover-only, don't toggle the row or activate the label
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
     >
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
         <circle

@@ -155,7 +155,7 @@ export const AdvancedSettingsView = ({
                 onChange={item.onChange}
               >
                 <Text>{item.label}</Text>
-                <Hint text={item.hint} />
+                <Hint inline text={item.hint} />
               </Toggle>
             </Stack>
           </Panel>

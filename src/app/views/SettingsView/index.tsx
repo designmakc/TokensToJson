@@ -687,6 +687,7 @@ export const SettingsView = (props: ViewProps) => {
           >
             <Text>DTCG 2025.10 format</Text>
             <Hint
+              inline
               text={t(
                 'Align output with the DTCG 2025.10 spec: $-prefixed keys ($value, $type), dimensions as objects, Figma-only types kept in $extensions.'
               )}

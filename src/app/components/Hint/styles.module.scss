@@ -21,6 +21,14 @@
   }
 }
 
+// For hints inside a Toggle <label>: its invisible checkbox <input> is
+// stretched over the whole row and steals hover unless the icon is lifted.
+// Kept out of .hint — positioned overlay hints must not inherit `relative`.
+.inline {
+  position: relative;
+  z-index: 2;
+}
+
 .bubble {
   position: fixed;
   z-index: 1000;
