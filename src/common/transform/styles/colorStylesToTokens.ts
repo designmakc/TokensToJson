@@ -1,8 +1,47 @@
 import { groupObjectNamesIntoCategories } from '@common/transform/groupObjectNamesIntoCategories';
 import { convertRGBA } from '@common/transform/color/convertRGBA';
+import { getGradientGeometry } from '@common/transform/color/gradientGeometry';
 import { getTokenKeyName } from '@common/transform/getTokenKeyName';
 import { getAliasVariableName } from '@common/transform/getAliasVariableName';
 import { IResolver } from '@common/resolver';
+
+const GRADIENT_EXTENSION_NAMESPACE = 'net.genlab.gradient';
+
+// Design-system contract checks. They only warn — export always proceeds.
+const validateGradientStyle = (
+  styleName: string,
+  paint: GradientPaint,
+  geometry: ReturnType<typeof getGradientGeometry>
+) => {
+  const isGradientSlot = /^gradient\//i.test(styleName);
+
+  paint.gradientStops.forEach((stop, i) => {
+    const bound = (stop as any).boundVariables?.color;
+
+    if (isGradientSlot && !bound?.id) {
+      console.warn(
+        `[tokens] Style "${styleName}": hardcoded color in gradient stop ${i} (position ${stop.position}). Stops under gradient/* must be bound to variables.`
+      );
+    }
+
+    if (!bound?.id && stop.color.a === 0) {
+      console.warn(
+        `[tokens] Style "${styleName}": stop ${i} has alpha=0. Platforms interpolate transparency differently — use rgba(<same color>, 0) instead of transparent.`
+      );
+    }
+  });
+
+  if (geometry.kind === 'linear') {
+    const midX = (geometry.start.x + geometry.end.x) / 2;
+    const midY = (geometry.start.y + geometry.end.y) / 2;
+
+    if (Math.abs(midX - 0.5) > 0.01 || Math.abs(midY - 0.5) > 0.01) {
+      console.warn(
+        `[tokens] Style "${styleName}": gradient handles are not symmetric around the center. CSS linear-gradient() cannot express this — web and native will render it differently.`
+      );
+    }
+  }
+};
 
 const convertGradientStopsToDTCG = async (
   gradientStops: ReadonlyArray<ColorStop>,
@@ -105,6 +144,9 @@ export const colorStylesToTokens = async (
         [keyNames.type]: 'color',
         [keyNames.value]:
           aliasVariable || convertRGBA(colorWithOpacity, colorMode),
+        $extensions: {
+          styleId: style.id,
+        },
       };
 
       allColorStyles[styleName] = styleObject;
@@ -119,6 +161,12 @@ export const colorStylesToTokens = async (
     ) {
       const paint = paints[0] as GradientPaint;
 
+      if (paints.length > 1) {
+        console.warn(
+          `[tokens] Style "${styleName}" has ${paints.length} paints; only the first is exported.`
+        );
+      }
+
       const gradientStops = await convertGradientStopsToDTCG(
         paint.gradientStops,
         colorMode,
@@ -127,12 +175,27 @@ export const colorStylesToTokens = async (
         resolver
       );
 
+      const geometry = getGradientGeometry(paint);
+      validateGradientStyle(styleName, paint, geometry);
+
       const styleObject = {
         [keyNames.type]: 'gradient',
         [keyNames.value]: gradientStops,
+        $extensions: {
+          [GRADIENT_EXTENSION_NAMESPACE]: {
+            ...geometry,
+            figmaStyleId: style.id,
+          },
+        },
       };
 
       allColorStyles[styleName] = styleObject;
+    } else {
+      console.warn(
+        `[tokens] Style "${styleName}" has an unsupported paint combination (${paints
+          .map((p) => p.type)
+          .join(', ')}); style skipped.`
+      );
     }
   }
 
