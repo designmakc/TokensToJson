@@ -1,6 +1,9 @@
 import { normalizeValue } from './normalizeValue';
 import { normalizeType, isNonSpecTokenType } from './normalizeType';
 import { getTokenKeyName } from './getTokenKeyName';
+import { PLUGIN_EXTENSION_NAMESPACE } from './extensionNamespace';
+import { resolveTokenCategory } from './categories/resolveTokenCategory';
+import { DEFAULT_CATEGORY_RULES } from './categories/defaultCategoryRules';
 
 import { groupObjectNamesIntoCategories } from './groupObjectNamesIntoCategories';
 import { IResolver } from '@common/resolver';
@@ -117,10 +120,37 @@ export const variablesToTokens = async (
     const filteredModesValues =
       Object.keys(modesValues).length === 1 ? {} : modesValues;
 
-    const tokenType = normalizeType(
+    let tokenType = normalizeType(
       variable.resolvedType,
       variable.scopes,
       usePercentageOpacity
+    );
+
+    const categoriesConfig = config.tokenCategories;
+    const categoryMatch = categoriesConfig?.isEnabled
+      ? resolveTokenCategory(
+          variable.name,
+          categoriesConfig.rules?.length
+            ? categoriesConfig.rules
+            : DEFAULT_CATEGORY_RULES
+        )
+      : null;
+
+    // Name-based type refinement (opt-in). Only generic FLOAT "dimension"
+    // is refined — a precise scope (FONT_WEIGHT/OPACITY) already produced
+    // a better type and the scope is more trustworthy than the name.
+    if (
+      categoriesConfig?.refineTypes &&
+      categoryMatch?.refineType &&
+      variable.resolvedType === 'FLOAT' &&
+      tokenType === 'dimension'
+    ) {
+      tokenType = categoryMatch.refineType;
+    }
+
+    // ALL_SCOPES is a Figma-picker workaround, not semantics — never export it
+    const meaningfulScopes = variable.scopes.filter(
+      (scope) => scope !== 'ALL_SCOPES'
     );
 
     // DTCG 2025.10 defines a closed type set — `string`/`boolean` are not
@@ -133,11 +163,15 @@ export const variablesToTokens = async (
       [keyNames.value]: defaultValue,
       [keyNames.description]: variable.description,
       // add scopes if true
-      ...(config.includeScopes && {
-        scopes: variable.scopes,
-      }),
+      ...(config.includeScopes &&
+        meaningfulScopes.length > 0 && {
+          scopes: meaningfulScopes,
+        }),
       // add meta
       $extensions: {
+        ...(categoryMatch && {
+          [PLUGIN_EXTENSION_NAMESPACE]: { category: categoryMatch.category },
+        }),
         mode: filteredModesValues,
         ...(omitType && { figmaType: variable.resolvedType }),
         ...(includeFigmaMetaData && {

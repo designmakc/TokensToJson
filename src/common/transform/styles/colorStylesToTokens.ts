@@ -5,9 +5,7 @@ import { getTokenKeyName } from '@common/transform/getTokenKeyName';
 import { getAliasVariableName } from '@common/transform/getAliasVariableName';
 import { IResolver } from '@common/resolver';
 
-// Single $extensions root for everything this plugin emits, mirroring the
-// upstream "tokens-bruecke-meta" convention: $extensions["tokens-to-json"]
-export const PLUGIN_EXTENSION_NAMESPACE = 'tokens-to-json';
+import { PLUGIN_EXTENSION_NAMESPACE } from '@common/transform/extensionNamespace';
 
 // Design-system contract checks. They only warn — export always proceeds.
 const validateGradientStyle = (

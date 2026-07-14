@@ -88,8 +88,27 @@ interface CustomURLCredentialsI {
   headers: string;
 }
 
+type TokenCategoryRefineTypeT =
+  | 'number'
+  | 'duration'
+  | 'fontWeight'
+  | 'dimension';
+
+type TokenCategoryRuleI = {
+  category: string;
+  keywords: string[];
+  refineType?: TokenCategoryRefineTypeT;
+};
+
+type TokenCategoriesConfigI = {
+  isEnabled: boolean;
+  refineTypes: boolean;
+  rules: TokenCategoryRuleI[];
+};
+
 interface ExportSettingsI {
   includedStyles: IncludedStylesI;
+  tokenCategories?: TokenCategoriesConfigI;
   includeScopes: boolean;
   useDTCG: boolean;
   includeValueStringKeyToAlias: boolean;
@@ -141,6 +160,9 @@ interface PluginTokenI {
   $extensions: {
     mode: Object;
     figmaType?: VariableResolvedDataType;
+    'tokens-to-json'?: {
+      category?: string;
+    };
     figma?: {
       variableId: string;
       codeSyntax: {

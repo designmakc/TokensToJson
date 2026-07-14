@@ -45,6 +45,16 @@
 - стоп с alpha=0 (платформы по-разному интерполируют прозрачность)
 - асимметричный linear-градиент (midpoint handles вне центра ±0.01) — CSS `linear-gradient()` не выразит
 
+### Категории токенов (semantic categories)
+
+Проблема: Figma заставляет ставить `ALL_SCOPES` (иначе переменную не выбрать в стилях/эффектах), и этот шум уезжал в JSON — разработчики не понимали роль токена.
+
+- `ALL_SCOPES` **всегда** вырезается из экспорта (информации не несёт); поле `scopes` пишется только если остались осмысленные значения
+- Резолвер `src/common/transform/categories/`: сегменты имени токена сверяются со словарём ключевых слов, категория пишется в `$extensions["tokens-to-json"].category` (например `spacing`, `gradient`, `opacity`). Побеждает самый глубокий сегмент: `color/gradient/x` → `gradient`. Матчатся и слова внутри kebab/snake-сегментов (`icon-size` → `size`)
+- Словарь редактируется в UI: Advanced settings → Token categories (категория + слова через запятую, Add rule / Reset to defaults); хранится в профиле
+- Тумблер `Refine token types by category` (выкл. по умолчанию): уточняет generic FLOAT `dimension` до спекового типа — `opacity/*` → `number`, `motion/*` → `duration`, `weight` → `fontWeight`. Точный Figma-scope (`FONT_WEIGHT`, `OPACITY`) всегда приоритетнее имени. Кастомные значения в `$type` («spacing») не пишутся принципиально — DTCG 2025.10 закрытый набор, Style Dictionary теряет такие токены
+- Style Dictionary фильтр: `(t) => t.$extensions?.['tokens-to-json']?.category === 'spacing'`
+
 ## UI
 
 ### Русская локализация

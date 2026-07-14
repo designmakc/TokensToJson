@@ -1,7 +1,14 @@
 import React from 'react';
 import styles from './styles.module.scss';
 
-import { Panel, PanelHeader, Stack, Text, Toggle } from 'react-figma-ui/ui';
+import {
+  Panel,
+  PanelHeader,
+  Stack,
+  Text,
+  Toggle,
+  Icon,
+} from 'react-figma-ui/ui';
 import { t } from '@app/i18n';
 import { Hint } from '@app/components/Hint';
 
@@ -160,6 +167,23 @@ export const AdvancedSettingsView = ({
             </Stack>
           </Panel>
         ))}
+
+        <Panel>
+          <PanelHeader
+            title={t('Token categories')}
+            onClick={() => {
+              setCurrentView('tokenCategories');
+            }}
+            iconButtons={[
+              {
+                children: <Icon name="caret-right" size="16" />,
+                onClick: () => {
+                  setCurrentView('tokenCategories');
+                },
+              },
+            ]}
+          />
+        </Panel>
       </Stack>
     </Panel>
   );

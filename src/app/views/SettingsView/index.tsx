@@ -22,6 +22,7 @@ import { t, LanguageT } from '@app/i18n';
 import { Toast, ToastRefI } from '@app/components/Toast';
 import { Hint } from '@app/components/Hint';
 import { AdvancedSettingsView } from '@app/views/AdvancedSettingsView';
+import { CategorySettingsView } from '@app/views/CategorySettingsView';
 import { ServerSettingsView } from '@app/views/ServerSettingsView';
 import { ProfileDetailView } from '@app/views/ProfileDetailView';
 import { NewProfileView } from '@app/views/NewProfileView';
@@ -870,6 +871,16 @@ export const SettingsView = (props: ViewProps) => {
     if (currentView === 'advancedSettings') {
       return (
         <AdvancedSettingsView
+          JSONsettingsConfig={JSONsettingsConfig}
+          setJSONsettingsConfig={setJSONsettingsConfig}
+          setCurrentView={setCurrentView}
+        />
+      );
+    }
+
+    if (currentView === 'tokenCategories') {
+      return (
+        <CategorySettingsView
           JSONsettingsConfig={JSONsettingsConfig}
           setJSONsettingsConfig={setJSONsettingsConfig}
           setCurrentView={setCurrentView}

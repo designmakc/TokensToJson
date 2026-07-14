@@ -1,4 +1,11 @@
+import { DEFAULT_CATEGORY_RULES } from '@common/transform/categories/defaultCategoryRules';
+
 const createDefaultJSONSettingsConfig = (): JSONSettingsConfigI => ({
+  tokenCategories: {
+    isEnabled: true,
+    refineTypes: false,
+    rules: DEFAULT_CATEGORY_RULES,
+  },
   includedStyles: {
     text: {
       isIncluded: false,
@@ -95,6 +102,15 @@ const sanitizeProfileConfig = (
     splitByCollection: safeConfig.splitByCollection ?? false,
     splitByMode: safeConfig.splitByMode ?? false,
     omitCollectionNames: safeConfig.omitCollectionNames ?? false,
+    tokenCategories: {
+      isEnabled: safeConfig.tokenCategories?.isEnabled ?? true,
+      refineTypes: safeConfig.tokenCategories?.refineTypes ?? false,
+      rules:
+        Array.isArray(safeConfig.tokenCategories?.rules) &&
+        safeConfig.tokenCategories.rules.length > 0
+          ? safeConfig.tokenCategories.rules
+          : DEFAULT_CATEGORY_RULES,
+    },
     servers: {
       ...defaults.servers,
       ...(safeConfig.servers || {}),
