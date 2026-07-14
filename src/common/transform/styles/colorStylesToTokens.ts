@@ -5,7 +5,9 @@ import { getTokenKeyName } from '@common/transform/getTokenKeyName';
 import { getAliasVariableName } from '@common/transform/getAliasVariableName';
 import { IResolver } from '@common/resolver';
 
-const GRADIENT_EXTENSION_NAMESPACE = 'io.github.designmakc.gradient';
+// Single $extensions root for everything this plugin emits, mirroring the
+// upstream "tokens-bruecke-meta" convention: $extensions["tokens-to-json"]
+export const PLUGIN_EXTENSION_NAMESPACE = 'tokens-to-json';
 
 // Design-system contract checks. They only warn — export always proceeds.
 const validateGradientStyle = (
@@ -182,9 +184,11 @@ export const colorStylesToTokens = async (
         [keyNames.type]: 'gradient',
         [keyNames.value]: gradientStops,
         $extensions: {
-          [GRADIENT_EXTENSION_NAMESPACE]: {
-            ...geometry,
-            figmaStyleId: style.id,
+          [PLUGIN_EXTENSION_NAMESPACE]: {
+            gradient: {
+              ...geometry,
+              figmaStyleId: style.id,
+            },
           },
         },
       };
