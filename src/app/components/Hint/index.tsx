@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './styles.module.scss';
 
 interface HintProps {
@@ -9,11 +10,13 @@ interface HintProps {
   inline?: boolean;
 }
 
-// ⓘ icon with a CSS-only tooltip bubble. The bubble is position:fixed so it
-// never gets clipped by panel overflow; on hover we clamp it to the window.
+// ⓘ icon with a tooltip bubble. The bubble is rendered through a portal into
+// document.body so no row-level stacking context can paint over it, and it is
+// position:fixed with viewport clamping so panel overflow never clips it.
 export const Hint = ({ text, className, inline }: HintProps) => {
   const iconRef = useRef<HTMLSpanElement | null>(null);
   const bubbleRef = useRef<HTMLSpanElement | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const [bubbleStyle, setBubbleStyle] = useState<React.CSSProperties>({});
 
   const positionBubble = () => {
@@ -45,7 +48,11 @@ export const Hint = ({ text, className, inline }: HintProps) => {
       className={`${styles.hint} ${inline ? styles.inline : ''} ${
         className || ''
       }`}
-      onMouseEnter={positionBubble}
+      onMouseEnter={() => {
+        positionBubble();
+        setIsVisible(true);
+      }}
+      onMouseLeave={() => setIsVisible(false)}
       // settings rows are clickable and hints may sit inside a <label> —
       // ⓘ is hover-only, don't toggle the row or activate the label
       onClick={(event) => {
@@ -64,9 +71,16 @@ export const Hint = ({ text, className, inline }: HintProps) => {
         <circle cx="6" cy="3.6" r="0.75" fill="currentColor" />
         <rect x="5.35" y="5.2" width="1.3" height="3.6" rx="0.65" fill="currentColor" />
       </svg>
-      <span ref={bubbleRef} className={styles.bubble} style={bubbleStyle}>
-        {text}
-      </span>
+      {createPortal(
+        <span
+          ref={bubbleRef}
+          className={`${styles.bubble} ${isVisible ? styles.bubbleVisible : ''}`}
+          style={bubbleStyle}
+        >
+          {text}
+        </span>,
+        document.body
+      )}
     </span>
   );
 };

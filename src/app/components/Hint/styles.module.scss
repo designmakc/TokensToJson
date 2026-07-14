@@ -12,12 +12,6 @@
 
   &:hover {
     color: var(--figma-color-icon, #333333);
-
-    .bubble {
-      visibility: visible;
-      opacity: 1;
-      transition-delay: 250ms;
-    }
   }
 }
 
@@ -45,6 +39,13 @@
   white-space: normal;
   visibility: hidden;
   opacity: 0;
-  transition: opacity 120ms ease;
+  transition: opacity 120ms ease, visibility 0s linear;
   pointer-events: none;
+}
+
+.bubbleVisible {
+  visibility: visible;
+  opacity: 1;
+  // hover intent delay — bubble appears only after the cursor settles
+  transition-delay: 250ms, 250ms;
 }
