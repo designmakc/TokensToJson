@@ -466,20 +466,31 @@ export const SettingsView = (props: ViewProps) => {
       </Panel>
 
       <Panel>
-        <PanelHeader
-          title={t('Show output')}
-          onClick={handleShowOutput}
-          iconButtons={[
-            {
-              children: <Icon name="sidebar" size="32" />,
-              onClick: handleShowOutput,
-            },
-          ]}
-        />
+        <div
+          title={t(
+            'Preview the generated JSON in a sidebar: syntax highlighting, search, copy button and stats. Click Update to refresh.'
+          )}
+        >
+          <PanelHeader
+            title={t('Show output')}
+            onClick={handleShowOutput}
+            iconButtons={[
+              {
+                children: <Icon name="sidebar" size="32" />,
+                onClick: handleShowOutput,
+              },
+            ]}
+          />
+        </div>
       </Panel>
 
       <Panel>
         <Stack hasLeftRightPadding>
+          <div
+            title={t(
+              'Color format for exported values: HEX, RGBA, HSLA (CSS or object syntax), sRGB/HSL/OKLCH per the DTCG spec.'
+            )}
+          >
           <Dropdown
             label={t('Color mode')}
             value={JSONsettingsConfig.colorMode}
@@ -540,11 +551,18 @@ export const SettingsView = (props: ViewProps) => {
               },
             ]}
           />
+          </div>
         </Stack>
       </Panel>
 
       <Panel>
-        <PanelHeader title={t('Include styles')} isActive />
+        <div
+          title={t(
+            'Export Figma styles (typography, grids, effects, colors) into the JSON. Each group can be renamed.'
+          )}
+        >
+          <PanelHeader title={t('Include styles')} isActive />
+        </div>
 
         <Stack hasLeftRightPadding={false} hasTopBottomPadding gap={2}>
           {stylesList.map((item, index) => {
@@ -606,6 +624,11 @@ export const SettingsView = (props: ViewProps) => {
       }) && (
         <Panel>
           <Stack hasLeftRightPadding>
+            <div
+              title={t(
+                'Where to put styles in the JSON: as separate root collections (Keep separate) or inside a chosen variable collection.'
+              )}
+            >
             <Dropdown
               label={t('Add styles to')}
               value={JSONsettingsConfig.storeStyleInCollection}
@@ -636,24 +659,31 @@ export const SettingsView = (props: ViewProps) => {
                 },
               ]}
             />
+            </div>
           </Stack>
         </Panel>
       )}
 
       <Panel>
         <Stack hasLeftRightPadding>
-          <Toggle
-            id="use-dtcg"
-            checked={JSONsettingsConfig.useDTCG}
-            onChange={(checked: boolean) => {
-              setJSONsettingsConfig({
-                ...JSONsettingsConfig,
-                useDTCG: checked,
-              });
-            }}
+          <div
+            title={t(
+              'Align output with the DTCG 2025.10 spec: $-prefixed keys ($value, $type), dimensions as objects, Figma-only types kept in $extensions.'
+            )}
           >
-            <Text>DTCG 2025.10 format</Text>
-          </Toggle>
+            <Toggle
+              id="use-dtcg"
+              checked={JSONsettingsConfig.useDTCG}
+              onChange={(checked: boolean) => {
+                setJSONsettingsConfig({
+                  ...JSONsettingsConfig,
+                  useDTCG: checked,
+                });
+              }}
+            >
+              <Text>DTCG 2025.10 format</Text>
+            </Toggle>
+          </div>
         </Stack>
       </Panel>
 
@@ -681,6 +711,11 @@ export const SettingsView = (props: ViewProps) => {
       </Panel>
 
       <Panel>
+        <div
+          title={t(
+            'Connect JSONBin, GitHub, GitHub PR, GitLab or a custom URL and push the generated JSON directly. Multiple servers are pushed one by one.'
+          )}
+        >
         <PanelHeader
           ref={serversHeaderRef}
           title={t('Push to server')}
@@ -710,6 +745,7 @@ export const SettingsView = (props: ViewProps) => {
             },
           ]}
         />
+        </div>
 
         {isAnyServerEnabled && (
           <Stack

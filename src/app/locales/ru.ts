@@ -30,6 +30,34 @@ export const ru: Record<string, string> = {
   'string for aliases': 'к алиасам',
   'Include figma metadata': 'Включить метаданные Figma',
 
+  // Setting hints (from README / official docs)
+  'Preview the generated JSON in a sidebar: syntax highlighting, search, copy button and stats. Click Update to refresh.':
+    'Превью итогового JSON в боковой панели: подсветка синтаксиса, поиск, кнопка копирования и статистика. Обновление — по кнопке «Обновить».',
+  'Color format for exported values: HEX, RGBA, HSLA (CSS or object syntax), sRGB/HSL/OKLCH per the DTCG spec.':
+    'Формат цвета в экспорте: HEX, RGBA, HSLA (CSS- или объектный синтаксис), sRGB/HSL/OKLCH по спецификации DTCG.',
+  'Export Figma styles (typography, grids, effects, colors) into the JSON. Each group can be renamed.':
+    'Экспорт стилей Figma (типографика, сетки, эффекты, цвета) в JSON. Каждую группу можно переименовать.',
+  'Where to put styles in the JSON: as separate root collections (Keep separate) or inside a chosen variable collection.':
+    'Куда класть стили в JSON: отдельными коллекциями в корне («Хранить отдельно») или внутрь выбранной коллекции переменных.',
+  'Align output with the DTCG 2025.10 spec: $-prefixed keys ($value, $type), dimensions as objects, Figma-only types kept in $extensions.':
+    'Вывод по спецификации DTCG 2025.10: ключи с $ ($value, $type), dimension как объекты, чисто фигмовские типы — в $extensions.',
+  'Connect JSONBin, GitHub, GitHub PR, GitLab or a custom URL and push the generated JSON directly. Multiple servers are pushed one by one.':
+    'Подключите JSONBin, GitHub, GitHub PR, GitLab или свой URL и отправляйте JSON напрямую. Несколько серверов — по очереди.',
+  'Each variable collection becomes its own {Collection}.tokens.json file (a zip archive on download).':
+    'Каждая коллекция переменных — отдельный файл {Collection}.tokens.json (при скачивании — zip-архив).',
+  'Each collection mode becomes its own {Collection}/{Mode}.tokens.json file with values resolved for that mode.':
+    'Каждый режим коллекции — отдельный файл {Collection}/{Mode}.tokens.json со значениями, разрешёнными для этого режима.',
+  'Drop top-level collection names and merge all variables into one flat namespace. On name collisions the last one wins.':
+    'Убрать имена коллекций с верхнего уровня и слить переменные в одно плоское пространство имён. При совпадении имён побеждает последняя.',
+  "Add each variable's Figma scopes to the JSON as an array of strings, without transformations.":
+    'Добавлять scopes переменных Figma в JSON массивом строк, без преобразований.',
+  'Export OPACITY-scoped values as percentages ("10%") instead of decimals (0.1).':
+    'Экспортировать значения со scope OPACITY процентами («10%») вместо долей (0.1).',
+  'Append .value (or .$value in DTCG format) to alias paths, e.g. {colors.primary.10.value}.':
+    'Добавлять .value (в DTCG-формате — .$value) в конец путей алиасов, напр. {colors.primary.10.value}.',
+  "Add Figma metadata (variableId, codeSyntax, collection info) into each token's $extensions.":
+    'Добавлять метаданные Figma (variableId, codeSyntax, данные коллекции) в $extensions каждого токена.',
+
   // EmptyView
   'No variables found in the file': 'В файле не найдено переменных',
   'Continue without variables': 'Продолжить без переменных',
