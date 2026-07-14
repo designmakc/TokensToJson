@@ -13,6 +13,7 @@ import {
   createProfileFromConfig,
   sanitizeMultiTenantConfig,
 } from './controller/storageConfig';
+import { setLanguage, LanguageT } from './i18n';
 
 import styles from './styles.module.scss';
 
@@ -36,6 +37,14 @@ const Container = () => {
 
   const [multiTenantConfig, setMultiTenantConfig] =
     useState<MultiTenantConfigI>(createDefaultConfig());
+
+  const language: LanguageT = multiTenantConfig.language === 'ru' ? 'ru' : 'en';
+  // Module-level i18n state must be set before children render t() calls
+  setLanguage(language);
+
+  const handleLanguageChange = (nextLanguage: LanguageT) => {
+    setMultiTenantConfig((prev) => ({ ...prev, language: nextLanguage }));
+  };
 
   const activeProfileId = multiTenantConfig.activeProfileId;
   const JSONsettingsConfig =
@@ -376,12 +385,15 @@ const Container = () => {
         frameHeight={manualFrameHeight ?? frameHeight}
         onResizeHeight={handleResizeHeight}
         onResetHeight={handleResetHeight}
+        language={language}
+        onLanguageChange={handleLanguageChange}
       />
     );
   };
 
   return (
-    <div ref={wrapperRef} className={styles.container}>
+    // key remounts the tree on language switch so every t() re-evaluates
+    <div ref={wrapperRef} className={styles.container} key={language}>
       {renderView()}
       {isCodePreviewOpen && (
         <CodePreviewView generatedTokens={generatedTokens} />

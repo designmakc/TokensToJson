@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
 import { Octokit } from '@octokit/core';
+import { t } from '@app/i18n';
 
 export const pushToGithub = async (
   credentials: GithubCredentialsI,
@@ -51,8 +52,8 @@ export const pushToGithub = async (
     // handle status response
     console.log('File updated successfully:', response);
     toastCallback({
-      title: 'Github: Updated successfully',
-      message: 'Tokens on Github have been updated successfully',
+      title: t('Github: Updated successfully'),
+      message: t('Tokens on Github have been updated successfully'),
       options: {
         type: 'success',
       },
@@ -71,8 +72,8 @@ export const pushToGithub = async (
         // handle status response
         console.log('File created successfully:', response);
         toastCallback({
-          title: 'Github: Created successfully',
-          message: 'Tokens on Github have been created successfully',
+          title: t('Github: Created successfully'),
+          message: t('Tokens on Github have been created successfully'),
           options: {
             type: 'success',
           },
@@ -81,8 +82,8 @@ export const pushToGithub = async (
         // handle status response
         console.error('Error creating file:', error);
         toastCallback({
-          title: 'Github: Error creating file',
-          message: `Error creating file: ${error.message}.`,
+          title: t('Github: Error creating file'),
+          message: `${t('Error creating file:')} ${error.message}.`,
           options: {
             type: 'error',
           },
@@ -90,7 +91,7 @@ export const pushToGithub = async (
       }
     } else {
       toastCallback({
-        title: 'Github: An error occurred',
+        title: t('Github: An error occurred'),
         message: error.message,
         options: {
           type: 'error',

@@ -6,6 +6,7 @@ import { getTokensStat } from '@common/transform/getTokensStat';
 import { JsonViewer } from '@app/components/JsonViewer';
 
 import { Text, Icon } from 'react-figma-ui/ui';
+import { t } from '@app/i18n';
 
 interface CodePreviewViewProps {
   generatedTokens: any;
@@ -71,20 +72,21 @@ export const CodePreviewView = ({ generatedTokens }: CodePreviewViewProps) => {
           onClick={getTokensPreview}
         >
           <Icon name="refresh" size="16" />
-          <Text>Update</Text>
+          <Text>{t('Update')}</Text>
         </button>
 
         <button
           className={`${styles.toolbarItem} ${styles.previewToolbarSecondButton}`}
           onClick={copyCode}
         >
-          <Text>{isCodeCopied ? 'Copied!' : 'Copy'}</Text>
+          <Text>{isCodeCopied ? t('Copied!') : t('Copy')}</Text>
         </button>
 
         <div className={`${styles.toolbarItem} ${styles.previewToolbarStat}`}>
           <Text>
-            {tokensStat.tokensCount} tokens, {tokensStat.groupsCount} groups,{' '}
-            {tokensStat.codeLines} lines
+            {/* ponytail: no plural forms — stats readout, "1 токенов" acceptable */}
+            {tokensStat.tokensCount} {t('tokens')}, {tokensStat.groupsCount}{' '}
+            {t('groups')}, {tokensStat.codeLines} {t('lines')}
           </Text>
         </div>
 

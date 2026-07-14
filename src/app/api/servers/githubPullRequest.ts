@@ -1,4 +1,5 @@
 import { Octokit } from '@octokit/core';
+import { t } from '@app/i18n';
 
 export const githubPullRequest = async (
   credentials: GithubPullRequestCredentialsI,
@@ -31,8 +32,8 @@ export const githubPullRequest = async (
       await createPullRequest();
       console.log('pull request created');
       toastCallback({
-        title: 'Github: Updated successfully',
-        message: 'Github Pull Request has been updated successfully',
+        title: t('Github: Updated successfully'),
+        message: t('Github Pull Request has been updated successfully'),
         options: {
           type: 'success',
         },
@@ -40,8 +41,8 @@ export const githubPullRequest = async (
     } catch (error) {
       console.log('error creating pull request', error);
       toastCallback({
-        title: 'Github: Error creating pull request',
-        message: `Error creating pull request: ${error.message}.`,
+        title: t('Github: Error creating pull request'),
+        message: `${t('Error creating pull request:')} ${error.message}.`,
         options: {
           type: 'error',
         },

@@ -17,6 +17,7 @@ import {
 } from 'react-figma-ui/ui';
 
 import { config } from '@app/controller/config';
+import { t, LanguageT } from '@app/i18n';
 
 import { Toast, ToastRefI } from '@app/components/Toast';
 import { AdvancedSettingsView } from '@app/views/AdvancedSettingsView';
@@ -57,6 +58,8 @@ interface ViewProps {
   frameHeight: number;
   onResizeHeight: (height: number) => void;
   onResetHeight: () => void;
+  language: LanguageT;
+  onLanguageChange: (language: LanguageT) => void;
 }
 
 const version = pkg.version;
@@ -130,6 +133,8 @@ export const SettingsView = (props: ViewProps) => {
     frameHeight,
     onResizeHeight,
     onResetHeight,
+    language,
+    onLanguageChange,
   } = props;
   const [isPushing, setIsPushing] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -244,7 +249,7 @@ export const SettingsView = (props: ViewProps) => {
     } catch (error) {
       console.error('Import error:', error);
       toastRef.current?.show({
-        title: 'Import Error',
+        title: t('Import Error'),
         message: error instanceof Error ? error.message : String(error),
         options: {
           type: 'error',
@@ -364,7 +369,7 @@ export const SettingsView = (props: ViewProps) => {
 
         if (result) {
           toastRef.current?.show({
-            title: result.success ? 'Import Successful' : 'Import Failed',
+            title: result.success ? t('Import Successful') : t('Import Failed'),
             message: result.message,
             options: {
               type: result.success ? 'success' : 'error',
@@ -462,7 +467,7 @@ export const SettingsView = (props: ViewProps) => {
 
       <Panel>
         <PanelHeader
-          title="Show output"
+          title={t('Show output')}
           onClick={handleShowOutput}
           iconButtons={[
             {
@@ -476,7 +481,7 @@ export const SettingsView = (props: ViewProps) => {
       <Panel>
         <Stack hasLeftRightPadding>
           <Dropdown
-            label="Color mode"
+            label={t('Color mode')}
             value={JSONsettingsConfig.colorMode}
             onChange={(value: string) => {
               setJSONsettingsConfig({
@@ -539,7 +544,7 @@ export const SettingsView = (props: ViewProps) => {
       </Panel>
 
       <Panel>
-        <PanelHeader title="Include styles" isActive />
+        <PanelHeader title={t('Include styles')} isActive />
 
         <Stack hasLeftRightPadding={false} hasTopBottomPadding gap={2}>
           {stylesList.map((item, index) => {
@@ -602,7 +607,7 @@ export const SettingsView = (props: ViewProps) => {
         <Panel>
           <Stack hasLeftRightPadding>
             <Dropdown
-              label="Add styles to"
+              label={t('Add styles to')}
               value={JSONsettingsConfig.storeStyleInCollection}
               onChange={(value: string) => {
                 setJSONsettingsConfig({
@@ -615,7 +620,7 @@ export const SettingsView = (props: ViewProps) => {
                   options: [
                     {
                       id: 'none',
-                      label: 'Keep separate',
+                      label: t('Keep separate'),
                     },
                   ],
                 },
@@ -654,7 +659,7 @@ export const SettingsView = (props: ViewProps) => {
 
       <Panel>
         <PanelHeader
-          title="Advanced settings"
+          title={t('Advanced settings')}
           onClick={() => {
             setCurrentView('advancedSettings');
           }}
@@ -678,7 +683,7 @@ export const SettingsView = (props: ViewProps) => {
       <Panel>
         <PanelHeader
           ref={serversHeaderRef}
-          title="Push to server"
+          title={t('Push to server')}
           onClick={handleShowServersOverlayList}
           iconButtons={[
             {
@@ -747,7 +752,7 @@ export const SettingsView = (props: ViewProps) => {
             <Stack>
               <Button
                 loading={isPushing}
-                label="Push to server"
+                label={t('Push to server')}
                 onClick={getTokensForPush}
                 fullWidth
               />
@@ -759,13 +764,13 @@ export const SettingsView = (props: ViewProps) => {
       <Panel hasLeftRightPadding bottomBorder={false}>
         <Stack hasLeftRightPadding hasTopBottomPadding gap="var(--space-small)">
           <Button
-            label="Download JSON"
+            label={t('Download JSON')}
             onClick={getTokensForDownload}
             fullWidth
             secondary
           />
           <Button
-            label="Import tokens (Beta)"
+            label={t('Import tokens (Beta)')}
             onClick={handleImportTokens}
             loading={isImporting}
             fullWidth
@@ -865,7 +870,14 @@ export const SettingsView = (props: ViewProps) => {
         >
           <Stack direction="row" className={styles.about}>
             <a href={config.docsLink} target="_blank">
-              <Text>Documentation</Text>
+              <Text>{t('Documentation')}</Text>
+            </a>
+            <a
+              onClick={() => onLanguageChange(language === 'ru' ? 'en' : 'ru')}
+              style={{ cursor: 'pointer' }}
+              title={t('Switch language')}
+            >
+              <Text>{language === 'ru' ? 'EN' : 'RU'}</Text>
             </a>
             <a href={config.changelogLink} target="_blank">
               <Text>v.{version}</Text>
@@ -877,7 +889,7 @@ export const SettingsView = (props: ViewProps) => {
           className={styles.heightResizer}
           onMouseDown={startHeightResize}
           onDoubleClick={onResetHeight}
-          title="Drag to resize. Double-click to auto-fit"
+          title={t('Drag to resize. Double-click to auto-fit')}
         />
       </Stack>
     </>

@@ -1,3 +1,5 @@
+import { t } from '@app/i18n';
+
 export const pushToJSONBin = async (
   credentials: JsonbinCredentialsI,
   tokens: any,
@@ -40,8 +42,8 @@ export const pushToJSONBin = async (
     console.log('JSONBin success', json);
 
     toastCallback({
-      title: 'JSONBin: Updated successfully',
-      message: 'Tokens on JSONBin have been updated successfully',
+      title: t('JSONBin: Updated successfully'),
+      message: t('Tokens on JSONBin have been updated successfully'),
       options: {
         type: 'success',
       },
@@ -54,8 +56,10 @@ export const pushToJSONBin = async (
   console.log('JSONBin error', response);
   if (!response.ok) {
     toastCallback({
-      title: 'JSONBin: Error pushing tokens',
-      message: `Error pushing tokens to JSONBin: ${response.statusText}`,
+      title: t('JSONBin: Error pushing tokens'),
+      message: `${t('Error pushing tokens to JSONBin:')} ${
+        response.statusText
+      }`,
       options: {
         type: 'error',
       },

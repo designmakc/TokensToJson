@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { Panel, PanelHeader, Stack, Button, Input } from 'react-figma-ui/ui';
+import { t } from '@app/i18n';
 
 interface NewProfileViewProps {
   addProfile: (profileName: string) => void;
@@ -17,7 +18,7 @@ export const NewProfileView = ({
     <Panel hasLeftRightPadding={false} hasTopBottomPadding bottomBorder={false}>
       <Stack hasLeftRightPadding={false}>
         <PanelHeader
-          title="Create profile"
+          title={t('Create profile')}
           isActive
           hasBackButton
           onClick={() => {
@@ -30,7 +31,7 @@ export const NewProfileView = ({
         <Stack gap="var(--space-extra-small)">
           <Input
             id="create-profile-name"
-            placeholder="Profile name"
+            placeholder={t('Profile name')}
             value={profileName}
             onChange={(value: string) => {
               setProfileName(value);
@@ -40,7 +41,7 @@ export const NewProfileView = ({
 
         <Stack hasTopBottomPadding gap="var(--space-extra-small)">
           <Button
-            label="Create"
+            label={t('Create')}
             fullWidth
             secondary
             disabled={!profileName.trim()}

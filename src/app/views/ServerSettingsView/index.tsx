@@ -9,6 +9,7 @@ import {
   Input,
   Text,
 } from 'react-figma-ui/ui';
+import { t } from '@app/i18n';
 
 type ViewsConfigI = {
   [K in ServerType]: {
@@ -35,22 +36,24 @@ interface ViewProps {
   server: ServerType;
 }
 
-const viewsConfig = {
+// Function, not a module-level const: t() must re-evaluate on language change
+const getViewsConfig = () =>
+  ({
   jsonbin: {
-    title: 'JSONbin credentials',
+    title: t('JSONbin credentials'),
     description: (
       <>
-        To use JSONbin you need to create{' '}
+        {t('To use JSONbin you need to create')}{' '}
         <a href="https://jsonbin.io/" target="_blank" rel="noopener noreferrer">
-          an account
+          {t('an account')}
         </a>{' '}
-        and get your{' '}
+        {t('and get your')}{' '}
         <a
           href="https://jsonbin.io/api-reference/access-keys/create"
           target="_blank"
           rel="noopener noreferrer"
         >
-          API key
+          {t('API key')}
         </a>
         .
       </>
@@ -59,21 +62,21 @@ const viewsConfig = {
     fields: [
       {
         id: 'name',
-        placeholder: 'Bin name',
+        placeholder: t('Bin name'),
         type: 'input',
         value: 'design.tokens',
         required: true,
       },
       {
         id: 'secretKey',
-        placeholder: 'Access Key',
+        placeholder: t('Access Key'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'id',
-        placeholder: 'Bin ID (for existing bin)',
+        placeholder: t('Bin ID (for existing bin)'),
         type: 'input',
         value: '',
         required: false,
@@ -81,16 +84,16 @@ const viewsConfig = {
     ],
   },
   github: {
-    title: 'Github credentials',
+    title: t('Github credentials'),
     description: (
       <>
-        In order to post on Github you need to have a{' '}
+        {t('In order to post on Github you need to have a')}{' '}
         <a
           href="https://github.com/settings/tokens/new?scopes=repo"
           target="_blank"
           rel="noopener noreferrer"
         >
-          personal access token
+          {t('personal access token')}
         </a>
         .
       </>
@@ -99,42 +102,42 @@ const viewsConfig = {
     fields: [
       {
         id: 'token',
-        placeholder: 'Personal access token',
+        placeholder: t('Personal access token'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'owner',
-        placeholder: 'Owner',
+        placeholder: t('Owner'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'repo',
-        placeholder: 'Repo name',
+        placeholder: t('Repo name'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'branch',
-        placeholder: 'Branch name',
+        placeholder: t('Branch name'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'fileName',
-        placeholder: 'File name',
+        placeholder: t('File name'),
         type: 'input',
         value: 'design.tokens.json',
         required: true,
       },
       {
         id: 'commitMessage',
-        placeholder: 'Commit message (optional)',
+        placeholder: t('Commit message (optional)'),
         type: 'input',
         value: '',
         required: false,
@@ -142,16 +145,16 @@ const viewsConfig = {
     ],
   },
   githubPullRequest: {
-    title: 'Github credentials',
+    title: t('Github credentials'),
     description: (
       <>
-        In order to post on Github you need to have a{' '}
+        {t('In order to post on Github you need to have a')}{' '}
         <a
           href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token"
           target="_blank"
           rel="noopener noreferrer"
         >
-          personal access token
+          {t('personal access token')}
         </a>
         .
       </>
@@ -160,63 +163,63 @@ const viewsConfig = {
     fields: [
       {
         id: 'token',
-        placeholder: 'Personal access token',
+        placeholder: t('Personal access token'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'owner',
-        placeholder: 'Owner',
+        placeholder: t('Owner'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'repo',
-        placeholder: 'Repo name',
+        placeholder: t('Repo name'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'baseBranch',
-        placeholder: 'Base branch',
+        placeholder: t('Base branch'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'branch',
-        placeholder: 'Branch name (optional)',
+        placeholder: t('Branch name (optional)'),
         type: 'input',
         value: '',
         required: false,
       },
       {
         id: 'fileName',
-        placeholder: 'File name',
+        placeholder: t('File name'),
         type: 'input',
         value: 'design.tokens.json',
         required: true,
       },
       {
         id: 'commitMessage',
-        placeholder: 'Commit message (optional)',
+        placeholder: t('Commit message (optional)'),
         type: 'input',
         value: '',
         required: false,
       },
       {
         id: 'pullRequestTitle',
-        placeholder: 'PR title (optional)',
+        placeholder: t('PR title (optional)'),
         type: 'input',
         value: '',
         required: false,
       },
       {
         id: 'pullRequestBody',
-        placeholder: 'PR body (optional)',
+        placeholder: t('PR body (optional)'),
         type: 'input',
         value: '',
         required: false,
@@ -224,16 +227,16 @@ const viewsConfig = {
     ],
   },
   gitlab: {
-    title: 'Gitlab credentials',
+    title: t('Gitlab credentials'),
     description: (
       <>
-        In order to post on Gitlab you need to have a{' '}
+        {t('In order to post on Gitlab you need to have a')}{' '}
         <a
           href="https://docs.gitlab.com/ee/user/project/settings/project_access_tokens.html"
           target="_blank"
           rel="noopener noreferrer"
         >
-          project access token
+          {t('project access token')}
         </a>
         .
       </>
@@ -242,49 +245,49 @@ const viewsConfig = {
     fields: [
       {
         id: 'host',
-        placeholder: 'Gitlab host for selfhosted (default: gitlab.com)',
+        placeholder: t('Gitlab host for selfhosted (default: gitlab.com)'),
         type: 'input',
         value: '',
         required: false,
       },
       {
         id: 'token',
-        placeholder: 'Project access token',
+        placeholder: t('Project access token'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'owner',
-        placeholder: 'Owner',
+        placeholder: t('Owner'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'repo',
-        placeholder: 'Repo name',
+        placeholder: t('Repo name'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'branch',
-        placeholder: 'Branch name',
+        placeholder: t('Branch name'),
         type: 'input',
         value: '',
         required: true,
       },
       {
         id: 'fileName',
-        placeholder: 'File name',
+        placeholder: t('File name'),
         type: 'input',
         value: 'design.tokens.json',
         required: true,
       },
       {
         id: 'commitMessage',
-        placeholder: 'Commit message (optional)',
+        placeholder: t('Commit message (optional)'),
         type: 'input',
         value: '',
         required: false,
@@ -292,11 +295,12 @@ const viewsConfig = {
     ],
   },
   customURL: {
-    title: 'Custom URL',
+    title: t('Custom URL'),
     description: (
       <>
-        To use custom URL you need to create a server that will accept POST or
-        PUT requests with JSON body.
+        {t(
+          'To use custom URL you need to create a server that will accept POST or PUT requests with JSON body.'
+        )}
       </>
     ),
     isEnabled: false,
@@ -310,20 +314,20 @@ const viewsConfig = {
       },
       {
         id: 'method',
-        placeholder: 'Method (POST or PUT)',
+        placeholder: t('Method (POST or PUT)'),
         type: 'input',
         required: true,
       },
       {
         id: 'headers',
-        placeholder: 'Headers (optional)',
+        placeholder: t('Headers (optional)'),
         type: 'input',
         value: '',
         required: false,
       },
     ],
   },
-} as ViewsConfigI;
+} as ViewsConfigI);
 
 interface LocalConfigI {
   isEnabled: boolean;
@@ -333,6 +337,7 @@ interface LocalConfigI {
 export const ServerSettingsView = (props: ViewProps) => {
   const { JSONsettingsConfig, setJSONsettingsConfig, setCurrentView } = props;
   const [errorFields, setErrorFields] = useState([] as string[]);
+  const viewsConfig = getViewsConfig();
 
   const [config, setConfig] = useState(
     viewsConfig[props.server].fields.reduce((acc, field) => {
@@ -423,7 +428,7 @@ export const ServerSettingsView = (props: ViewProps) => {
 
         <Stack hasTopBottomPadding gap="var(--space-extra-small)">
           <Button
-            label="Save"
+            label={t('Save')}
             fullWidth
             secondary
             // disabled={!isFormValid}
@@ -463,7 +468,7 @@ export const ServerSettingsView = (props: ViewProps) => {
             }}
           />
           <Button
-            label="Remove"
+            label={t('Remove')}
             fullWidth
             secondary
             danger

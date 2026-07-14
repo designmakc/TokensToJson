@@ -30,6 +30,7 @@ import { defaultKeymap } from '@codemirror/commands';
 import { tags } from '@lezer/highlight';
 
 import { Icon } from 'react-figma-ui/ui';
+import { t } from '@app/i18n';
 
 import styles from './styles.module.scss';
 
@@ -358,7 +359,7 @@ export const JsonViewer = ({ code }: JsonViewerProps) => {
             <input
               ref={inputRef}
               type="text"
-              placeholder="Search…"
+              placeholder={t('Search…')}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={handleInputKeyDown}
@@ -377,18 +378,18 @@ export const JsonViewer = ({ code }: JsonViewerProps) => {
             <button
               onClick={() => goToMatch(-1)}
               disabled={matchCount === 0}
-              title="Previous match (Shift+Enter)"
+              title={t('Previous match (Shift+Enter)')}
             >
               <Icon name="arrow-up" size="16" />
             </button>
             <button
               onClick={() => goToMatch(1)}
               disabled={matchCount === 0}
-              title="Next match (Enter)"
+              title={t('Next match (Enter)')}
             >
               <Icon name="arrow-down" size="16" />
             </button>
-            <button onClick={closeSearch} title="Close search (Esc)">
+            <button onClick={closeSearch} title={t('Close search (Esc)')}>
               <CloseIcon />
             </button>
           </>
@@ -396,7 +397,7 @@ export const JsonViewer = ({ code }: JsonViewerProps) => {
           <button
             className={styles.searchTrigger}
             onClick={openSearch}
-            title="Search (⌘F)"
+            title={t('Search (⌘F)')}
           >
             <Icon name="search" size="16" />
           </button>

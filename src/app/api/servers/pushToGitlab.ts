@@ -1,3 +1,5 @@
+import { t } from '@app/i18n';
+
 export const pushToGitlab = async (
   credentials: GitlabCredentialsI,
   tokens: any,
@@ -36,8 +38,8 @@ export const pushToGitlab = async (
     } catch (error) {
       console.error('Error:', error);
       toastCallback({
-        title: 'Gitlab: An error occured',
-        message: `Error: ${error.message}`,
+        title: t('Gitlab: An error occured'),
+        message: `${t('Error:')} ${error.message}`,
         options: {
           type: 'error',
         },
@@ -59,8 +61,8 @@ export const pushToGitlab = async (
 
       console.log('File updated successfully');
       toastCallback({
-        title: 'Gitlab: Updated successfully',
-        message: 'Tokens on Gitlab have been updated successfully',
+        title: t('Gitlab: Updated successfully'),
+        message: t('Tokens on Gitlab have been updated successfully'),
         options: {
           type: 'success',
         },
@@ -71,8 +73,8 @@ export const pushToGitlab = async (
 
     console.error('Error:', data.message);
     toastCallback({
-      title: 'Gitlab: An error occured',
-      message: `Error: ${data.message}`,
+      title: t('Gitlab: An error occured'),
+      message: `${t('Error:')} ${data.message}`,
       options: {
         type: 'error',
       },
@@ -82,8 +84,8 @@ export const pushToGitlab = async (
     // if file doesn't exist, create it
     console.log('File created successfully');
     toastCallback({
-      title: 'Gitlab: Created successfully',
-      message: 'Tokens on Gitlab have been created successfully',
+      title: t('Gitlab: Created successfully'),
+      message: t('Tokens on Gitlab have been created successfully'),
       options: {
         type: 'success',
       },

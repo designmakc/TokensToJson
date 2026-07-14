@@ -139,6 +139,7 @@ export const createDefaultConfig = (): MultiTenantConfigI => {
     profiles: {
       [defaultProfileId]: createProfile('Default profile', {}),
     },
+    language: 'en',
   };
 };
 
@@ -179,6 +180,7 @@ const normalizeConfig = (
       ? (config.activeProfileId as string)
       : Object.keys(normalizedProfiles)[0],
     profiles: normalizedProfiles,
+    language: config.language === 'ru' ? 'ru' : 'en',
   };
 };
 

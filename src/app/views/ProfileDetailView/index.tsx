@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { Panel, PanelHeader, Stack, Button, Input } from 'react-figma-ui/ui';
+import { t } from '@app/i18n';
 
 interface ProfileDetailViewProps {
   profileId: string;
@@ -25,7 +26,7 @@ export const ProfileDetailView = ({
     <Panel hasLeftRightPadding={false} hasTopBottomPadding bottomBorder={false}>
       <Stack hasLeftRightPadding={false}>
         <PanelHeader
-          title={initialProfileName || 'Profile'}
+          title={initialProfileName || t('Profile')}
           isActive
           hasBackButton
           onClick={() => {
@@ -38,7 +39,7 @@ export const ProfileDetailView = ({
         <Stack gap="var(--space-extra-small)">
           <Input
             id="profile-name"
-            placeholder="Profile name"
+            placeholder={t('Profile name')}
             value={profileName}
             onChange={(value: string) => {
               setProfileName(value);
@@ -48,7 +49,7 @@ export const ProfileDetailView = ({
 
         <Stack hasTopBottomPadding gap="var(--space-extra-small)">
           <Button
-            label="Save"
+            label={t('Save')}
             fullWidth
             secondary
             disabled={
@@ -63,7 +64,7 @@ export const ProfileDetailView = ({
           />
 
           <Button
-            label="Remove"
+            label={t('Remove')}
             fullWidth
             secondary
             danger

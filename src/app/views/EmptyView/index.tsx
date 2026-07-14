@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { config } from '@app/controller/config';
+import { t } from '@app/i18n';
 
 import { Text, Button, Stack } from 'react-figma-ui/ui';
 import { StatusPicture } from '@app/components/StatusPicture';
@@ -22,14 +23,14 @@ export const EmptyView = ({
     <section className={styles.emptyView}>
       <Stack gap={8} className={styles.group}>
         <StatusPicture status="error" />
-        <Text className={styles.label}>No variables found in the file</Text>
+        <Text className={styles.label}>{t('No variables found in the file')}</Text>
       </Stack>
 
       <Stack gap={8} className={styles.group}>
         {onImportTokens && (
           <Button
             className={styles.button}
-            label="Import tokens (Beta)"
+            label={t('Import tokens (Beta)')}
             onClick={onImportTokens}
             loading={isImporting}
             fullWidth
@@ -37,7 +38,7 @@ export const EmptyView = ({
         )}
         <Button
           className={styles.button}
-          label="Continue without variables"
+          label={t('Continue without variables')}
           secondary
           onClick={() => {
             setFileHasVariables(true);
@@ -53,7 +54,7 @@ export const EmptyView = ({
             margin: '15px',
           }}
         >
-          Documentation 📖
+          {t('Documentation')} 📖
         </a>
       </Stack>
     </section>

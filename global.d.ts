@@ -128,6 +128,7 @@ type SettingsProfileI = JSONSettingsConfigI & {
 type MultiTenantConfigI = {
   activeProfileId: ProfileId;
   profiles: Record<ProfileId, SettingsProfileI>;
+  language?: 'en' | 'ru';
 };
 
 interface PluginTokenI {
