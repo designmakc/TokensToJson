@@ -5,6 +5,13 @@ export const ru: Record<string, string> = {
   'Show output': 'Показать результат',
   'Color mode': 'Формат цвета',
   'Include styles': 'Включить стили',
+  'Include collections': 'Включить коллекции',
+  'Style name convention': 'Именование стилей',
+  'As in Figma': 'Как в Figma',
+  'Case convention for style token keys. Figma style names are free-form ("Adaptive Header/H1"); this rewrites each name segment. "As in Figma" changes nothing. Variable names are never rewritten — aliases point at them.':
+    'Регистр ключей у токенов стилей. Имена стилей в Figma произвольные («Adaptive Header/H1»), настройка переписывает каждый сегмент имени. «Как в Figma» не меняет ничего. Имена переменных не переписываются никогда — на них ссылаются алиасы.',
+  'Pick which variable collections end up in the export. Turning one off also drops its variables; aliases from other collections into it are left unresolved.':
+    'Выбор коллекций переменных, попадающих в экспорт. Отключение убирает и переменные коллекции; ссылки из других коллекций на неё остаются неразрешёнными.',
   'Add styles to': 'Добавить стили в',
   'Keep separate': 'Хранить отдельно',
   'Advanced settings': 'Расширенные настройки',
@@ -144,6 +151,8 @@ export const ru: Record<string, string> = {
   'Github: Error creating file': 'Github: ошибка создания файла',
   'Error creating file:': 'Ошибка создания файла:',
   'Github: An error occurred': 'Github: произошла ошибка',
+  'Repository or branch not found. Check owner, repo and branch in settings.':
+    'Репозиторий или ветка не найдены. Проверьте owner, repo и branch в настройках.',
   'Github: Error creating pull request':
     'Github: ошибка создания pull request',
   'Error creating pull request:': 'Ошибка создания pull request:',

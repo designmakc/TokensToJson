@@ -3,6 +3,7 @@ import { convertRGBA } from '@common/transform/color/convertRGBA';
 import { getTokenKeyName } from '@common/transform/getTokenKeyName';
 import { getAliasVariableName } from '@common/transform/getAliasVariableName';
 import { makeDimension } from '@common/transform/makeDimension';
+import { applyNameConvention } from './applyNameConvention';
 import { IResolver } from '@common/resolver';
 
 const wrapShadowObject = async (
@@ -51,7 +52,8 @@ export const effectStylesToTokens = async (
   colorMode: colorModeType,
   isDTCGForamt: boolean,
   includeValueStringKeyToAlias: boolean,
-  resolver: IResolver
+  resolver: IResolver,
+  nameConvention: nameConventionType = 'none'
 ) => {
   const keyNames = getTokenKeyName(isDTCGForamt);
   const effectStyles = await resolver.getLocalEffectStyles();
@@ -109,7 +111,9 @@ export const effectStylesToTokens = async (
 
   // console.log("allEffectStyles", allEffectStyles);
 
-  effectTokens[customName] = groupObjectNamesIntoCategories(allEffectStyles);
+  effectTokens[customName] = groupObjectNamesIntoCategories(
+    applyNameConvention(allEffectStyles, nameConvention)
+  );
 
   return effectTokens;
 };

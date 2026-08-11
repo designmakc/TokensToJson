@@ -187,6 +187,31 @@ describe('variablesToTokens token categories', () => {
     expect(refined.$value).toBe(0.4);
   });
 
+  test('refined font-weight is a bare number, not a px dimension', async () => {
+    const weightVar = [
+      {
+        ...(variables[0] as object),
+        name: 'typography/font-weight/600',
+        scopes: ['ALL_SCOPES'],
+        valuesByMode: { m1: 600 },
+        id: 'v12',
+      },
+    ] as unknown as Variable[];
+
+    const tokens = await variablesToTokens(
+      weightVar,
+      collections,
+      {
+        ...categoriesOn,
+        tokenCategories: { isEnabled: true, refineTypes: true, rules: [] },
+      } as ExportSettingsI,
+      resolver
+    );
+    const weight = tokens['core']['typography']['font-weight']['600'];
+    expect(weight.$type).toBe('fontWeight');
+    expect(weight.$value).toBe(600);
+  });
+
   test('refined duration gets a ms duration object, not px', async () => {
     const durationVar = [
       {

@@ -26,6 +26,8 @@ const defaultConfig: ExportSettingsI = {
       customName: 'Color-styles',
     },
   },
+  excludedCollections: [],
+  styleNameConvention: 'none',
   storeStyleInCollection: 'none',
   colorMode: 'hex',
   includeScopes: false,

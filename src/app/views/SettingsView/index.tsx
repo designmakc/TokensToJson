@@ -330,7 +330,9 @@ export const SettingsView = (props: ViewProps) => {
               tokens,
               (params) => {
                 toastRef.current?.show(params);
-              }
+              },
+              JSONsettingsConfig.splitByCollection,
+              JSONsettingsConfig.splitByMode
             );
           }
 
@@ -561,6 +563,44 @@ export const SettingsView = (props: ViewProps) => {
         </Stack>
       </Panel>
 
+      {JSONsettingsConfig.variableCollections.length > 0 && (
+        <Panel>
+          <div className={styles.hintAnchor}>
+            <PanelHeader title={t('Include collections')} isActive />
+            <Hint
+              className={`${styles.hintInHeader} ${styles.hintInHeaderBare}`}
+              text={t(
+                'Pick which variable collections end up in the export. Turning one off also drops its variables; aliases from other collections into it are left unresolved.'
+              )}
+            />
+          </div>
+
+          <Stack hasLeftRightPadding hasTopBottomPadding gap={2}>
+            {JSONsettingsConfig.variableCollections.map((collection) => {
+              const excluded = JSONsettingsConfig.excludedCollections || [];
+
+              return (
+                <Toggle
+                  key={collection}
+                  id={`collection-${collection}`}
+                  checked={!excluded.includes(collection)}
+                  onChange={(checked: boolean) => {
+                    setJSONsettingsConfig({
+                      ...JSONsettingsConfig,
+                      excludedCollections: checked
+                        ? excluded.filter((name) => name !== collection)
+                        : [...excluded, collection],
+                    });
+                  }}
+                >
+                  <Text>{collection}</Text>
+                </Toggle>
+              );
+            })}
+          </Stack>
+        </Panel>
+      )}
+
       <Panel>
         <div className={styles.hintAnchor}>
           <PanelHeader title={t('Include styles')} isActive />
@@ -666,6 +706,39 @@ export const SettingsView = (props: ViewProps) => {
                       };
                     }
                   ),
+                },
+              ]}
+            />
+            </div>
+          </Stack>
+
+          <Stack hasLeftRightPadding>
+            <div className={styles.hintAnchor}>
+            <Hint
+              className={styles.hintInDropdownLabel}
+              text={t(
+                'Case convention for style token keys. Figma style names are free-form ("Adaptive Header/H1"); this rewrites each name segment. "As in Figma" changes nothing. Variable names are never rewritten — aliases point at them.'
+              )}
+            />
+            <Dropdown
+              label={t('Style name convention')}
+              value={JSONsettingsConfig.styleNameConvention}
+              onChange={(value: string) => {
+                setJSONsettingsConfig({
+                  ...JSONsettingsConfig,
+                  styleNameConvention: value as nameConventionType,
+                });
+              }}
+              optionsSections={[
+                {
+                  options: [
+                    { id: 'none', label: t('As in Figma') },
+                    { id: 'kebab-case', label: 'kebab-case' },
+                    { id: 'camelCase', label: 'camelCase' },
+                    { id: 'PascalCase', label: 'PascalCase' },
+                    { id: 'snake_case', label: 'snake_case' },
+                    { id: 'MACRO_CASE', label: 'MACRO_CASE' },
+                  ],
                 },
               ]}
             />

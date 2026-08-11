@@ -7,7 +7,10 @@ export interface CategoryMatchI {
 // A keyword matches a whole segment or a hyphen/underscore-separated word
 // inside it ("icon-size" matches "size"). The deepest matching segment wins —
 // "color/gradient/x" resolves to "gradient", not "color". On a tie the rule
-// that comes first in the list wins, so dictionary order sets priority.
+// that comes first in the list wins, so dictionary order sets priority — with
+// one exception: a rule carrying refineType outranks one without, because a
+// segment like "font-weight" matches both the generic `font` rule and the
+// specific `weight` rule at the same depth and the generic one comes first.
 export const resolveTokenCategory = (
   tokenName: string,
   rules: TokenCategoryRuleI[]
@@ -28,7 +31,9 @@ export const resolveTokenCategory = (
     if (!keywords.length || !rule.category) continue;
 
     for (let i = 0; i < segments.length; i++) {
-      if (i <= bestSegmentIndex) continue;
+      if (i < bestSegmentIndex) continue;
+      const outranksOnTie = !!rule.refineType && !best?.refineType;
+      if (i === bestSegmentIndex && !outranksOnTie) continue;
 
       const words = segments[i].split(/[-_\s]+/);
       const isMatch = keywords.some(

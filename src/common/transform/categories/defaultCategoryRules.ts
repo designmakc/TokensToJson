@@ -15,7 +15,7 @@ export const DEFAULT_CATEGORY_RULES: TokenCategoryRuleI[] = [
   },
   {
     category: 'effect',
-    keywords: ['effect', 'effects', 'shadow', 'shadows', 'elevation'],
+    keywords: ['effect', 'effects', 'shadow', 'shadows', 'elevation', 'blur', 'blurs'],
   },
   { category: 'border', keywords: ['border', 'borders', 'stroke', 'strokes'] },
   { category: 'radius', keywords: ['radius', 'radii', 'corner', 'rounding'] },

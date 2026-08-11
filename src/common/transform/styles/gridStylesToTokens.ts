@@ -1,12 +1,14 @@
 import { groupObjectNamesIntoCategories } from '@common/transform/groupObjectNamesIntoCategories';
 import { getTokenKeyName } from '@common/transform/getTokenKeyName';
 import { makeDimension } from '@common/transform/makeDimension';
+import { applyNameConvention } from './applyNameConvention';
 import { IResolver } from '@common/resolver';
 
 export const gridStylesToTokens = async (
   customName: string,
   isDTCGForamt: boolean,
-  resolver: IResolver
+  resolver: IResolver,
+  nameConvention: nameConventionType = 'none'
 ) => {
   const keyNames = getTokenKeyName(isDTCGForamt);
   const gridStyles = await resolver.getLocalGridStyles();
@@ -55,7 +57,9 @@ export const gridStylesToTokens = async (
 
   // console.log("allTextStyles", allTextStyles);
 
-  textTokens[customName] = groupObjectNamesIntoCategories(allGridStyles);
+  textTokens[customName] = groupObjectNamesIntoCategories(
+    applyNameConvention(allGridStyles, nameConvention)
+  );
 
   return textTokens;
 };

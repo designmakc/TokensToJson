@@ -1,18 +1,15 @@
 /// <reference path="./node_modules/@figma/plugin-typings/index.d.ts" />
 
+// Naming conventions offered for style token keys. Trimmed to the ones that
+// are unambiguous for token names — the wider list this type used to carry was
+// never implemented anywhere.
 type nameConventionType =
   | 'none'
-  | 'PascalCase'
-  | 'camelCase'
-  | 'snake_case'
   | 'kebab-case'
-  | 'UPPERCASE'
-  | 'lowercase'
-  | 'MACRO_CASE'
-  | 'COBOL-CASE'
-  | 'Cobol case'
-  | 'Ada_Case'
-  | 'dot.notation';
+  | 'camelCase'
+  | 'PascalCase'
+  | 'snake_case'
+  | 'MACRO_CASE';
 
 type colorModeType =
   | 'hex'
@@ -108,6 +105,12 @@ type TokenCategoriesConfigI = {
 
 interface ExportSettingsI {
   includedStyles: IncludedStylesI;
+  // Collection names kept out of the export. Stored as an exclude list so that
+  // an empty value means "export everything" and collections added in Figma
+  // later are included by default.
+  excludedCollections: string[];
+  // Case convention applied to style token keys. 'none' keeps Figma's names.
+  styleNameConvention: nameConventionType;
   tokenCategories?: TokenCategoriesConfigI;
   includeScopes: boolean;
   useDTCG: boolean;

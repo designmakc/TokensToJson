@@ -6,6 +6,7 @@ import { getAliasVariableName } from '@common/transform/getAliasVariableName';
 import { IResolver } from '@common/resolver';
 
 import { PLUGIN_EXTENSION_NAMESPACE } from '@common/transform/extensionNamespace';
+import { applyNameConvention } from './applyNameConvention';
 
 // Design-system contract checks. They only warn — export always proceeds.
 const validateGradientStyle = (
@@ -98,7 +99,8 @@ export const colorStylesToTokens = async (
   colorMode: colorModeType,
   isDTCGForamt: boolean,
   includeValueStringKeyToAlias: boolean,
-  resolver: IResolver
+  resolver: IResolver,
+  nameConvention: nameConventionType = 'none'
 ) => {
   const keyNames = getTokenKeyName(isDTCGForamt);
   const paintStyles = await resolver.getLocalPaintStyles();
@@ -145,7 +147,9 @@ export const colorStylesToTokens = async (
         [keyNames.value]:
           aliasVariable || convertRGBA(colorWithOpacity, colorMode),
         $extensions: {
-          styleId: style.id,
+          [PLUGIN_EXTENSION_NAMESPACE]: {
+            styleId: style.id,
+          },
         },
       };
 
@@ -201,7 +205,9 @@ export const colorStylesToTokens = async (
     }
   }
 
-  colorTokens[customName] = groupObjectNamesIntoCategories(allColorStyles);
+  colorTokens[customName] = groupObjectNamesIntoCategories(
+    applyNameConvention(allColorStyles, nameConvention)
+  );
 
   return colorTokens;
 };

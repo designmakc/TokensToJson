@@ -43,11 +43,36 @@ describe('resolveTokenCategory', () => {
     });
   });
 
+  test('single "font-weight" segment keeps refineType, not just "font"', () => {
+    expect(resolve('typography/font-weight/600')).toEqual({
+      category: 'font',
+      refineType: 'fontWeight',
+    });
+    expect(resolve('font-weight/6xl')).toEqual({
+      category: 'font',
+      refineType: 'fontWeight',
+    });
+  });
+
+  test('a deeper plain match still beats a shallower refined one', () => {
+    expect(
+      resolveTokenCategory('opacity/border/radius', [
+        { category: 'opacity', keywords: ['opacity'], refineType: 'number' },
+        { category: 'radius', keywords: ['radius'] },
+      ])
+    ).toEqual({ category: 'radius' });
+  });
+
   test('motion duration refines to duration', () => {
     expect(resolve('motion/duration/fast')).toEqual({
       category: 'motion',
       refineType: 'duration',
     });
+  });
+
+  test('blur resolves to effect', () => {
+    expect(resolve('blur/sm')).toEqual({ category: 'effect' });
+    expect(resolve('primitive/blur/8')).toEqual({ category: 'effect' });
   });
 
   test('no match returns null', () => {

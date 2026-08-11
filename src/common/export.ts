@@ -80,8 +80,20 @@ export const getTokens = async (
   config: ExportSettingsI,
   _state?: PluginStateI
 ) => {
-  const variableCollection = await resolver.getLocalVariableCollections();
-  const variables = await resolver.getLocalVariables();
+  // Drop excluded collections and every variable that belongs to them.
+  // ponytail: an alias pointing INTO an excluded collection is left dangling —
+  // exclude leaf collections (Figma's built-in Specs/annotations), not ones
+  // other collections reference.
+  const excluded = new Set(config.excludedCollections ?? []);
+  const variableCollection = (
+    await resolver.getLocalVariableCollections()
+  ).filter((collection) => !excluded.has(collection.name));
+  const keptCollectionIds = new Set(
+    variableCollection.map((collection) => collection.id)
+  );
+  const variables = (await resolver.getLocalVariables()).filter((variable) =>
+    keptCollectionIds.has(variable.variableCollectionId)
+  );
 
   // convert variables to tokens
   const variableTokens = await variablesToTokens(

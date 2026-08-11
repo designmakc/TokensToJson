@@ -25,6 +25,8 @@ const createDefaultJSONSettingsConfig = (): JSONSettingsConfigI => ({
     },
   },
   variableCollections: [],
+  excludedCollections: [],
+  styleNameConvention: 'none',
   storeStyleInCollection: 'none',
   colorMode: 'hex',
   includeScopes: false,
@@ -99,6 +101,8 @@ const sanitizeProfileConfig = (
       (safeConfig as { useDTCGKeys?: boolean }).useDTCGKeys ??
       defaults.useDTCG,
     variableCollections: safeConfig.variableCollections || [],
+    excludedCollections: safeConfig.excludedCollections || [],
+    styleNameConvention: safeConfig.styleNameConvention || 'none',
     splitByCollection: safeConfig.splitByCollection ?? false,
     splitByMode: safeConfig.splitByMode ?? false,
     omitCollectionNames: safeConfig.omitCollectionNames ?? false,
