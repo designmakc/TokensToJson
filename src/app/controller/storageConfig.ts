@@ -33,7 +33,7 @@ const createDefaultJSONSettingsConfig = (): JSONSettingsConfigI => ({
   useDTCG: true,
   includeValueStringKeyToAlias: false,
   includeFigmaMetaData: false,
-  usePercentageOpacity: false,
+  opacityFormat: 'decimal',
   splitByCollection: false,
   splitByMode: false,
   omitCollectionNames: false,
@@ -100,6 +100,12 @@ const sanitizeProfileConfig = (
       safeConfig.useDTCG ??
       (safeConfig as { useDTCGKeys?: boolean }).useDTCGKeys ??
       defaults.useDTCG,
+    // Migrate legacy `usePercentageOpacity` boolean to `opacityFormat`
+    opacityFormat:
+      safeConfig.opacityFormat ??
+      ((safeConfig as { usePercentageOpacity?: boolean }).usePercentageOpacity
+        ? 'percent'
+        : defaults.opacityFormat),
     variableCollections: safeConfig.variableCollections || [],
     excludedCollections: safeConfig.excludedCollections || [],
     styleNameConvention: safeConfig.styleNameConvention || 'none',

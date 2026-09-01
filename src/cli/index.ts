@@ -34,7 +34,7 @@ const defaultConfig: ExportSettingsI = {
   includeValueStringKeyToAlias: false,
   includeFigmaMetaData: false,
   useDTCG: true,
-  usePercentageOpacity: false,
+  opacityFormat: 'decimal',
   splitByCollection: false,
   splitByMode: false,
   omitCollectionNames: false,
@@ -159,6 +159,12 @@ const options: ExportSettingsI = {
     (config as any).useDTCG ??
     (config as any).useDTCGKeys ??
     defaultConfig.useDTCG,
+  // Support legacy `usePercentageOpacity` config files (deprecated alias)
+  opacityFormat:
+    (config as any).opacityFormat ??
+    ((config as any).usePercentageOpacity
+      ? 'percent'
+      : defaultConfig.opacityFormat),
   // Explicit CLI flags override the config file, which overrides defaults
   splitByCollection:
     argv['split-by-collection'] ??

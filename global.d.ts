@@ -11,6 +11,10 @@ type nameConventionType =
   | 'snake_case'
   | 'MACRO_CASE';
 
+// Export format for OPACITY-scoped values: Figma stores 0-100.
+// 'decimal' → 0.5, 'number' → 50, 'percent' → "50%"
+type opacityFormatType = 'decimal' | 'number' | 'percent';
+
 type colorModeType =
   | 'hex'
   | 'rgba-object'
@@ -118,7 +122,7 @@ interface ExportSettingsI {
   colorMode: colorModeType;
   storeStyleInCollection: string;
   includeFigmaMetaData: boolean;
-  usePercentageOpacity: boolean;
+  opacityFormat: opacityFormatType;
   splitByCollection: boolean;
   splitByMode: boolean;
   omitCollectionNames: boolean;

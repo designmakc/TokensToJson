@@ -76,7 +76,7 @@ export const CategorySettingsView = ({
             <Hint
               inline
               text={t(
-                'Matches token name segments against the keywords below and writes the category into $extensions["tokens-to-json"].category. ALL_SCOPES is always stripped from the export — it is a Figma picker workaround, not semantics.'
+                'Matches token name segments against the keywords below and writes the category into $extensions["tokens-to-json"].category.'
               )}
             />
           </Toggle>

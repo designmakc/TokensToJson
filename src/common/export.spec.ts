@@ -57,7 +57,7 @@ const baseConfig = {
   useDTCG: true,
   includeValueStringKeyToAlias: false,
   includeFigmaMetaData: false,
-  usePercentageOpacity: false,
+  opacityFormat: 'decimal',
   omitCollectionNames: false,
   includeScopes: false,
   splitByCollection: false,

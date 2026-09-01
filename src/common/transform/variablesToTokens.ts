@@ -21,7 +21,7 @@ export const variablesToTokens = async (
     useDTCG,
     includeValueStringKeyToAlias,
     includeFigmaMetaData,
-    usePercentageOpacity,
+    opacityFormat,
     omitCollectionNames = false,
   } = config;
   const keyNames = getTokenKeyName(useDTCG);
@@ -107,9 +107,10 @@ export const variablesToTokens = async (
           colorMode,
           useDTCG,
           includeValueStringKeyToAlias,
-          usePercentageOpacity,
+          opacityFormat,
           omitCollectionNames,
           refinedType,
+          refinedCategory: refinedType ? categoryMatch?.category : undefined,
         },
         resolver
       );
@@ -144,17 +145,20 @@ export const variablesToTokens = async (
     let tokenType = normalizeType(
       variable.resolvedType,
       variable.scopes,
-      usePercentageOpacity
+      opacityFormat
     );
 
     if (refinedType && tokenType === 'dimension') {
-      tokenType = refinedType;
+      // Percent-formatted opacity is a "50%" string, not a number
+      tokenType =
+        categoryMatch?.category === 'opacity' && opacityFormat === 'percent'
+          ? 'string'
+          : refinedType;
     }
 
-    // ALL_SCOPES is a Figma-picker workaround, not semantics — never export it
-    const meaningfulScopes = variable.scopes.filter(
-      (scope) => scope !== 'ALL_SCOPES'
-    );
+    // Raw Figma scopes, untransformed (ALL_SCOPES included) — the semantic
+    // interpretation already lives in $extensions["tokens-to-json"].category
+    const rawScopes = variable.scopes;
 
     // DTCG 2025.10 defines a closed type set — `string`/`boolean` are not
     // valid `$type` values. In DTCG format, omit `$type` for those tokens
@@ -167,8 +171,8 @@ export const variablesToTokens = async (
       [keyNames.description]: variable.description,
       // add scopes if true
       ...(config.includeScopes &&
-        meaningfulScopes.length > 0 && {
-          scopes: meaningfulScopes,
+        rawScopes.length > 0 && {
+          scopes: rawScopes,
         }),
       // add meta
       $extensions: {

@@ -1,3 +1,14 @@
+.hintAnchor {
+  position: relative;
+}
+
+.hintInDropdownLabel {
+  position: absolute;
+  right: 0;
+  top: 1px;
+  z-index: 2;
+}
+
 .codeLine {
   display: inline-block;
   background-color: var(--figma-color-bg-pressed);

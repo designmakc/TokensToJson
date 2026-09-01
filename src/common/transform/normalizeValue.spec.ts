@@ -16,7 +16,7 @@ describe('getFontStyleAndWeight', () => {
           colorMode: 'hex',
           useDTCG: false,
           includeValueStringKeyToAlias: false,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )
@@ -33,7 +33,7 @@ describe('getFontStyleAndWeight', () => {
           colorMode: 'hex',
           useDTCG: true,
           includeValueStringKeyToAlias: false,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )
@@ -50,11 +50,47 @@ describe('getFontStyleAndWeight', () => {
           colorMode: 'hex',
           useDTCG: true,
           includeValueStringKeyToAlias: true,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )
     ).toBe(600);
+  });
+});
+
+describe('opacity', () => {
+  const opacityProps = (opacityFormat: opacityFormatType) => ({
+    variableValue: 50,
+    variableType: 'FLOAT' as VariableResolvedDataType,
+    variableScope: ['OPACITY'] as VariableScope[],
+    colorMode: 'hex' as colorModeType,
+    useDTCG: true,
+    includeValueStringKeyToAlias: false,
+    opacityFormat,
+  });
+
+  test('decimal format', async () => {
+    expect(await normalizeValue(opacityProps('decimal'), resolver)).toBe(0.5);
+  });
+
+  test('number format', async () => {
+    expect(await normalizeValue(opacityProps('number'), resolver)).toBe(50);
+  });
+
+  test('percent format', async () => {
+    expect(await normalizeValue(opacityProps('percent'), resolver)).toBe('50%');
+  });
+
+  test('multi-scope OPACITY falls back to dimension', async () => {
+    expect(
+      await normalizeValue(
+        {
+          ...opacityProps('percent'),
+          variableScope: ['OPACITY', 'EFFECT_FLOAT'],
+        },
+        resolver
+      )
+    ).toStrictEqual({ value: 50, unit: 'px' });
   });
 });
 
@@ -69,7 +105,7 @@ describe('getColor', () => {
           colorMode: 'hex',
           useDTCG: true,
           includeValueStringKeyToAlias: true,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )
@@ -86,7 +122,7 @@ describe('getColor', () => {
           colorMode: 'rgba-css',
           useDTCG: true,
           includeValueStringKeyToAlias: true,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )
@@ -103,7 +139,7 @@ describe('getColor', () => {
           colorMode: 'rgba-object',
           useDTCG: true,
           includeValueStringKeyToAlias: true,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )
@@ -120,7 +156,7 @@ describe('getColor', () => {
           colorMode: 'srgb-dtcg',
           useDTCG: true,
           includeValueStringKeyToAlias: true,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )
@@ -142,7 +178,7 @@ describe('getColor', () => {
           colorMode: 'hsla-css',
           useDTCG: true,
           includeValueStringKeyToAlias: true,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )
@@ -159,7 +195,7 @@ describe('getColor', () => {
           colorMode: 'hsla-object',
           useDTCG: true,
           includeValueStringKeyToAlias: true,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )
@@ -181,7 +217,7 @@ describe('getColor', () => {
           colorMode: 'hsl-dtcg',
           useDTCG: true,
           includeValueStringKeyToAlias: true,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )
@@ -203,7 +239,7 @@ describe('getColor', () => {
           colorMode: 'oklch-dtcg',
           useDTCG: true,
           includeValueStringKeyToAlias: true,
-          usePercentageOpacity: false,
+          opacityFormat: 'decimal',
         },
         resolver
       )

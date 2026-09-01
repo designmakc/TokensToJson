@@ -51,7 +51,7 @@ const baseConfig = {
   colorMode: 'hex',
   includeValueStringKeyToAlias: false,
   includeFigmaMetaData: false,
-  usePercentageOpacity: false,
+  opacityFormat: 'decimal',
   omitCollectionNames: false,
   includeScopes: false,
 } as ExportSettingsI;
@@ -124,17 +124,7 @@ describe('variablesToTokens token categories', () => {
     expect(brand.$extensions['tokens-to-json']).toBeUndefined();
   });
 
-  test('never exports ALL_SCOPES even with includeScopes on', async () => {
-    const tokens = await variablesToTokens(
-      variables,
-      collections,
-      { ...categoriesOn, includeScopes: true },
-      resolver
-    );
-    expect(tokens['core']['spacing']['sm'].scopes).toBeUndefined();
-  });
-
-  test('keeps meaningful scopes with includeScopes on', async () => {
+  test('exports raw scopes untransformed with includeScopes on', async () => {
     const scoped = [
       {
         ...(variables[0] as object),
@@ -151,7 +141,30 @@ describe('variablesToTokens token categories', () => {
     );
     expect(tokens['core']['radius']['md'].scopes).toStrictEqual([
       'CORNER_RADIUS',
+      'ALL_SCOPES',
     ]);
+  });
+
+  test('ALL_SCOPES-only variable still exports its scope', async () => {
+    const tokens = await variablesToTokens(
+      variables,
+      collections,
+      { ...categoriesOn, includeScopes: true },
+      resolver
+    );
+    expect(tokens['core']['spacing']['sm'].scopes).toStrictEqual([
+      'ALL_SCOPES',
+    ]);
+  });
+
+  test('no scopes field when includeScopes is off', async () => {
+    const tokens = await variablesToTokens(
+      variables,
+      collections,
+      { ...categoriesOn, includeScopes: false },
+      resolver
+    );
+    expect(tokens['core']['spacing']['sm'].scopes).toBeUndefined();
   });
 
   test('refines generic FLOAT dimension by name when refineTypes is on', async () => {
@@ -185,6 +198,49 @@ describe('variablesToTokens token categories', () => {
     expect(refined.$type).toBe('number');
     // refined value must be a bare number, not a {value, unit} dimension
     expect(refined.$value).toBe(0.4);
+  });
+
+  test('refined opacity honors opacityFormat (0-100 storage)', async () => {
+    const opacityVar = [
+      {
+        ...(variables[0] as object),
+        name: 'opacity/40',
+        valuesByMode: { m1: 40 },
+        id: 'v20',
+      },
+    ] as unknown as Variable[];
+    const refineOn = {
+      ...categoriesOn,
+      tokenCategories: { isEnabled: true, refineTypes: true, rules: [] },
+    } as ExportSettingsI;
+
+    const decimal = await variablesToTokens(
+      opacityVar,
+      collections,
+      refineOn,
+      resolver
+    );
+    expect(decimal['core']['opacity']['40'].$value).toBe(0.4);
+
+    const number = await variablesToTokens(
+      opacityVar,
+      collections,
+      { ...refineOn, opacityFormat: 'number' } as ExportSettingsI,
+      resolver
+    );
+    expect(number['core']['opacity']['40'].$value).toBe(40);
+
+    const percent = await variablesToTokens(
+      opacityVar,
+      collections,
+      { ...refineOn, opacityFormat: 'percent' } as ExportSettingsI,
+      resolver
+    );
+    const percentToken = percent['core']['opacity']['40'];
+    expect(percentToken.$value).toBe('40%');
+    // "40%" is a string — not a valid DTCG $type, so it is omitted
+    expect(percentToken.$type).toBeUndefined();
+    expect(percentToken.$extensions.figmaType).toBe('FLOAT');
   });
 
   test('refined font-weight is a bare number, not a px dimension', async () => {

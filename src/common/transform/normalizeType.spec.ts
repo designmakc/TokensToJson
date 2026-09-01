@@ -11,6 +11,16 @@ describe('getFontStyleAndWeight', () => {
   });
 });
 
+describe('opacity type by format', () => {
+  test('decimal and number formats export a number token', () => {
+    expect(normalizeType('FLOAT', ['OPACITY'], 'decimal')).toBe('number');
+    expect(normalizeType('FLOAT', ['OPACITY'], 'number')).toBe('number');
+  });
+  test('percent format exports a string token', () => {
+    expect(normalizeType('FLOAT', ['OPACITY'], 'percent')).toBe('string');
+  });
+});
+
 describe('isNonSpecTokenType', () => {
   test('string and boolean are not valid DTCG types', () => {
     expect(isNonSpecTokenType(normalizeType('STRING', []))).toBe(true);

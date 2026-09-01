@@ -8,6 +8,7 @@ import {
   Text,
   Toggle,
   Icon,
+  Dropdown,
 } from 'react-figma-ui/ui';
 import { t } from '@app/i18n';
 import { Hint } from '@app/components/Hint';
@@ -91,20 +92,6 @@ export const AdvancedSettingsView = ({
       },
     },
     {
-      id: 'use-percentage-opacity',
-      label: t('Use percentage for opacity'),
-      hint: t(
-        'Export OPACITY-scoped values as percentages ("10%") instead of decimals (0.1).'
-      ),
-      checked: JSONsettingsConfig.usePercentageOpacity,
-      onChange: (checked: boolean) => {
-        setJSONsettingsConfig({
-          ...JSONsettingsConfig,
-          usePercentageOpacity: checked,
-        });
-      },
-    },
-    {
       id: 'include-value-alias-string',
       label: (
         <>
@@ -167,6 +154,47 @@ export const AdvancedSettingsView = ({
             </Stack>
           </Panel>
         ))}
+
+        <Panel>
+          <Stack hasLeftRightPadding>
+            <div className={styles.hintAnchor}>
+              <Hint
+                className={styles.hintInDropdownLabel}
+                text={t(
+                  'Format for opacity values: variables with the OPACITY scope, or matched by the opacity category when Refine types is on.'
+                )}
+              />
+              <Dropdown
+                label={t('Opacity format')}
+                value={JSONsettingsConfig.opacityFormat}
+                onChange={(value: string) => {
+                  setJSONsettingsConfig({
+                    ...JSONsettingsConfig,
+                    opacityFormat: value as opacityFormatType,
+                  });
+                }}
+                optionsSections={[
+                  {
+                    options: [
+                      {
+                        id: 'decimal',
+                        label: `0.5 (${t('decimal')})`,
+                      },
+                      {
+                        id: 'number',
+                        label: `50 (${t('number')})`,
+                      },
+                      {
+                        id: 'percent',
+                        label: `50% (${t('string')})`,
+                      },
+                    ],
+                  },
+                ]}
+              />
+            </div>
+          </Stack>
+        </Panel>
 
         <Panel>
           <PanelHeader

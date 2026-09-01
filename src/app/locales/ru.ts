@@ -32,7 +32,10 @@ export const ru: Record<string, string> = {
   'Split modes into separate files': 'Разбить режимы по отдельным файлам',
   'Omit collection names': 'Опустить имена коллекций',
   'Include variable scopes': 'Включить scopes переменных',
-  'Use percentage for opacity': 'Прозрачность в процентах',
+  'Opacity format': 'Формат прозрачности',
+  decimal: 'доля',
+  number: 'число',
+  string: 'строка',
   Include: 'Добавлять',
   'string for aliases': 'к алиасам',
   'Include figma metadata': 'Включить метаданные Figma',
@@ -58,8 +61,8 @@ export const ru: Record<string, string> = {
     'Убрать имена коллекций с верхнего уровня и слить переменные в одно плоское пространство имён. При совпадении имён побеждает последняя.',
   "Add each variable's Figma scopes to the JSON as an array of strings, without transformations.":
     'Добавлять scopes переменных Figma в JSON массивом строк, без преобразований.',
-  'Export OPACITY-scoped values as percentages ("10%") instead of decimals (0.1).':
-    'Экспортировать значения со scope OPACITY процентами («10%») вместо долей (0.1).',
+  'Format for opacity values: variables with the OPACITY scope, or matched by the opacity category when Refine types is on.':
+    'Формат прозрачности: переменные со scope OPACITY, либо с категорией opacity при включённом Refine types.',
   'Append .value (or .$value in DTCG format) to alias paths, e.g. {colors.primary.10.value}.':
     'Добавлять .value (в DTCG-формате — .$value) в конец путей алиасов, напр. {colors.primary.10.value}.',
   "Add Figma metadata (variableId, codeSyntax, collection info) into each token's $extensions.":
@@ -75,8 +78,8 @@ export const ru: Record<string, string> = {
   'keyword, keyword': 'слово, слово',
   'Add rule': 'Добавить правило',
   'Reset to defaults': 'Сбросить к дефолтным',
-  'Matches token name segments against the keywords below and writes the category into $extensions["tokens-to-json"].category. ALL_SCOPES is always stripped from the export — it is a Figma picker workaround, not semantics.':
-    'Сегменты имени токена сверяются со словами ниже, категория пишется в $extensions["tokens-to-json"].category. ALL_SCOPES всегда вырезается из экспорта — это костыль пикеров Figma, а не семантика.',
+  'Matches token name segments against the keywords below and writes the category into $extensions["tokens-to-json"].category.':
+    'Сегменты имени токена сверяются со словами ниже, категория пишется в $extensions["tokens-to-json"].category.',
   'Upgrades generic FLOAT "dimension" to a more precise DTCG type: opacity to number, motion to duration, weight to fontWeight. A precise Figma scope always wins over the name.':
     'Уточняет generic FLOAT «dimension» до точного DTCG-типа: opacity → number, motion → duration, weight → fontWeight. Точный scope Figma всегда приоритетнее имени.',
 

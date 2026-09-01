@@ -40,9 +40,9 @@ Upstream экспортирует у градиентных стилей тол�
 
 ### Семантические категории токенов
 
-Figma вынуждает ставить переменным `ALL_SCOPES` (иначе их не выбрать в стилях и эффектах), и этот шум уезжал в JSON. Теперь:
+Figma вынуждает ставить переменным `ALL_SCOPES` (иначе их не выбрать в стилях и эффектах), и по одному `scopes` роль токена не ясна. Теперь:
 
-- `ALL_SCOPES` всегда вырезается из экспорта — это костыль пикеров Figma, а не семантика;
+- тумблер **Include variable scopes** пишет `scopes` как есть, без преобразований (включая `ALL_SCOPES`); семантика — отдельным полем `category`;
 - роль токена определяется по сегментам имени через настраиваемый словарь (Advanced settings → Token categories) и пишется в `$extensions["tokens-to-json"].category`: `spacing`, `gradient`, `radius`, `opacity`…;
 - опция **Refine token types**: generic FLOAT `dimension` уточняется до спекового типа по категории — `opacity/*` → `number`, `motion/*` → `duration` (`{ "value": 150, "unit": "ms" }`), `weight` → `fontWeight`. Точный Figma-scope всегда приоритетнее имени. За пределы закрытого набора типов DTCG 2025.10 плагин не выходит.
 

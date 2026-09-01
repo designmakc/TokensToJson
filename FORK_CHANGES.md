@@ -47,13 +47,25 @@
 
 ### Категории токенов (semantic categories)
 
-Проблема: Figma заставляет ставить `ALL_SCOPES` (иначе переменную не выбрать в стилях/эффектах), и этот шум уезжал в JSON — разработчики не понимали роль токена.
+Проблема: Figma заставляет ставить `ALL_SCOPES` (иначе переменную не выбрать в стилях/эффектах), и по одному только `scopes` разработчики не понимали роль токена.
 
-- `ALL_SCOPES` **всегда** вырезается из экспорта (информации не несёт); поле `scopes` пишется только если остались осмысленные значения
+- Тумблер `Include variable scopes` пишет `scopes` **как есть, без преобразований** (включая `ALL_SCOPES`); семантическая интерпретация — рядом, в `$extensions["tokens-to-json"].category`
 - Резолвер `src/common/transform/categories/`: сегменты имени токена сверяются со словарём ключевых слов, категория пишется в `$extensions["tokens-to-json"].category` (например `spacing`, `gradient`, `opacity`). Побеждает самый глубокий сегмент: `color/gradient/x` → `gradient`. Матчатся и слова внутри kebab/snake-сегментов (`icon-size` → `size`)
 - Словарь редактируется в UI: Advanced settings → Token categories (категория + слова через запятую, Add rule / Reset to defaults); хранится в профиле
 - Тумблер `Refine token types by category` (выкл. по умолчанию): уточняет generic FLOAT `dimension` до спекового типа — `opacity/*` → `number`, `motion/*` → `duration`, `weight` → `fontWeight`. Точный Figma-scope (`FONT_WEIGHT`, `OPACITY`) всегда приоритетнее имени. Кастомные значения в `$type` («spacing») не пишутся принципиально — DTCG 2025.10 закрытый набор, Style Dictionary теряет такие токены
 - Style Dictionary фильтр: `(t) => t.$extensions?.['tokens-to-json']?.category === 'spacing'`
+
+### Формат прозрачности (opacityFormat)
+
+Boolean `usePercentageOpacity` заменён на enum `opacityFormat` (значения со scope `OPACITY`; Figma хранит 0–100):
+
+- `decimal` (дефолт) → `0.5`, `$type: number`
+- `number` → `50`, `$type: number`
+- `percent` → `"50%"`, `$type: string` (в DTCG `$type` опускается, `figmaType: FLOAT` в `$extensions`)
+
+Dropdown в Advanced settings. Миграция: старые профили/CLI-конфиги с `usePercentageOpacity: true` → `percent`. Импорт (`tokensToVariables`) принимает все три формы: `"50%"` → 50, доля ≤1 → ×100, число >1 → как есть.
+
+Формат применяется в двух случаях: точный scope `OPACITY` (хранение 0–100 гарантировано Figma), либо категория `opacity` по имени при включённом **Refine types** — там хранение не гарантировано, поэтому эвристика как на импорте: значение ≤1 считается долей, >1 — процентами. Refine types выключен → generic dimension, как раньше.
 
 ## UI
 

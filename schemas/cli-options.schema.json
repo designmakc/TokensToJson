@@ -66,10 +66,16 @@
       "default": false,
       "description": "Include Figma-specific metadata (variable ids, collection ids) in $extensions[\"tokens-bruecke-meta\"]."
     },
+    "opacityFormat": {
+      "type": "string",
+      "enum": ["decimal", "number", "percent"],
+      "default": "decimal",
+      "description": "Format for OPACITY-scoped values (Figma stores 0-100): \"decimal\" exports 0.5, \"number\" exports 50, \"percent\" exports \"50%\"."
+    },
     "usePercentageOpacity": {
       "type": "boolean",
       "default": false,
-      "description": "Express opacity values as percentages instead of 0-1 numbers."
+      "description": "Deprecated: use opacityFormat instead. true maps to opacityFormat \"percent\"."
     },
     "splitByCollection": {
       "type": "boolean",
