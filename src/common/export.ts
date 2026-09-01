@@ -28,7 +28,9 @@ const collectModeNames = (tokens: Record<string, any>): Set<string> => {
 
 /**
  * Recursively replace each token's $value with the value for the given mode.
- * Removes $extensions.mode from the output.
+ * Removes $extensions.mode and $extensions.modeTargetIds from the output —
+ * both are per-mode maps that a single-mode file has no use for. The alias
+ * target of the selected mode is folded into $extensions.figma instead.
  */
 const applyModeToTokens = (
   tokens: Record<string, any>,
@@ -39,7 +41,20 @@ const applyModeToTokens = (
     if (value && typeof value === 'object' && !Array.isArray(value)) {
       if ('$value' in value) {
         const modeValue = value.$extensions?.mode?.[modeName];
-        const { mode: _mode, ...restExtensions } = value.$extensions || {};
+        const modeTargetId = value.$extensions?.modeTargetIds?.[modeName];
+        const {
+          mode: _mode,
+          modeTargetIds: _modeTargetIds,
+          ...restExtensions
+        } = value.$extensions || {};
+        if (restExtensions.figma) {
+          // Drop the default-mode target before setting this mode's own —
+          // a mode may alias where the default holds a raw value, or vice versa
+          const { targetVariableId: _target, ...figma } = restExtensions.figma;
+          restExtensions.figma = modeTargetId
+            ? { ...figma, targetVariableId: modeTargetId }
+            : figma;
+        }
         const extensions =
           Object.keys(restExtensions).length > 0 ? restExtensions : undefined;
         result[key] = {
@@ -74,6 +89,35 @@ const buildMeta = (
   variableCollections: variableCollections.map((collection) => collection.name),
   createdAt: new Date().toISOString(),
 });
+
+/**
+ * Stamp the collection and mode a split-export file holds.
+ * The file name is a sanitized mode name, which is not an identifier: mode
+ * names are case-sensitive, may contain path characters, and a rename is
+ * indistinguishable from a new mode without the id.
+ */
+const withCollectionMeta = (
+  meta: MetaPropsI,
+  collection: VariableCollection | undefined,
+  modeName?: string
+): MetaPropsI => {
+  if (!collection) {
+    // Styles stored under a pseudo-collection name have no Figma collection
+    return meta;
+  }
+  const mode =
+    collection.modes.find((item) => item.name === modeName) ??
+    (collection.modes.length === 1 ? collection.modes[0] : undefined);
+  return {
+    ...meta,
+    collection: {
+      id: collection.id,
+      name: collection.name,
+      defaultModeId: collection.defaultModeId,
+    },
+    ...(mode && { mode: { id: mode.modeId, name: mode.name } }),
+  };
+};
 
 export const getTokens = async (
   resolver: IResolver,
@@ -115,24 +159,38 @@ export const getTokens = async (
 
   const metaData = buildMeta(config, variableCollection);
 
+  const collectionByName = new Map(
+    variableCollection.map((collection) => [collection.name, collection])
+  );
+
   if (config.splitByMode) {
     // Return a map of { "collectionName/modeName": modeTokens } for each mode in each collection
     const result: Record<string, any> = {};
     for (const collectionName of Object.keys(mergedVariables)) {
       const collectionTokens = mergedVariables[collectionName];
+      const collection = collectionByName.get(collectionName);
       const modeNames = collectModeNames(collectionTokens);
       if (modeNames.size === 0) {
-        // No multi-mode data — treat as single file for this collection
+        // No multi-mode data — treat as single file for this collection.
+        // Its single mode is still named and identified, same as any other.
         result[collectionName] = {
           ...collectionTokens,
-          $extensions: { 'tokens-bruecke-meta': metaData },
+          $extensions: {
+            'tokens-bruecke-meta': withCollectionMeta(metaData, collection),
+          },
         };
       } else {
         for (const modeName of modeNames) {
           const modeTokens = applyModeToTokens(collectionTokens, modeName);
           result[`${collectionName}/${modeName}`] = {
             ...modeTokens,
-            $extensions: { 'tokens-bruecke-meta': metaData },
+            $extensions: {
+              'tokens-bruecke-meta': withCollectionMeta(
+                metaData,
+                collection,
+                modeName
+              ),
+            },
           };
         }
       }
@@ -146,7 +204,12 @@ export const getTokens = async (
     for (const key of Object.keys(mergedVariables)) {
       result[key] = {
         ...mergedVariables[key],
-        $extensions: { 'tokens-bruecke-meta': metaData },
+        $extensions: {
+          'tokens-bruecke-meta': withCollectionMeta(
+            metaData,
+            collectionByName.get(key)
+          ),
+        },
       };
     }
     return result;

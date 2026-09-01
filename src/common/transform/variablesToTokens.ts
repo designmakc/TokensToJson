@@ -60,12 +60,9 @@ export const variablesToTokens = async (
     // console.log("variable", variable);
     // get collection object
     const collectionId = variable.variableCollectionId;
-    const collectionName = collections.find(
-      (collection) => collection.id === collectionId
-    ).name;
-    const collectionDefaultModeId = collections.find(
-      (collection) => collection.id === collectionId
-    ).defaultModeId;
+    const collection = collections.find((item) => item.id === collectionId);
+    const collectionName = collection.name;
+    const collectionDefaultModeId = collection.defaultModeId;
     const collectionObject = {
       id: collectionId,
       name: collectionName,
@@ -98,6 +95,25 @@ export const variablesToTokens = async (
     // get values by mode
     const modes = variable.valuesByMode;
 
+    // Alias targets by mode. The string $value carries only the token path,
+    // so a reference cannot be resolved without parsing names — which breaks
+    // on the first token name containing a dot. The raw ids are unambiguous.
+    const aliasTargetId = (modeId: string) => {
+      const modeValue = modes[modeId] as VariableAlias | undefined;
+      return modeValue?.type === 'VARIABLE_ALIAS' ? modeValue.id : undefined;
+    };
+    const defaultTargetVariableId = aliasTargetId(collectionDefaultModeId);
+    const modeTargetIds: Record<string, string> = {};
+    for (const modeId of Object.keys(modes)) {
+      const modeName = collection.modes.find(
+        (mode) => mode.modeId === modeId
+      )?.name;
+      const targetId = aliasTargetId(modeId);
+      if (modeName && targetId) {
+        modeTargetIds[modeName] = targetId;
+      }
+    }
+
     const getValue = async (modeIndex: number) =>
       await normalizeValue(
         {
@@ -125,9 +141,9 @@ export const variablesToTokens = async (
       (
         await Promise.all(
           Object.keys(modes).map(async (modeId, index) => {
-            const modeName = collections
-              .find((collection) => collection.id === collectionId)
-              .modes.find((mode) => mode.modeId === modeId)?.name;
+            const modeName = collection.modes.find(
+              (mode) => mode.modeId === modeId
+            )?.name;
 
             if (modeName) {
               return [[modeName, await getValue(index)]];
@@ -180,12 +196,28 @@ export const variablesToTokens = async (
           [PLUGIN_EXTENSION_NAMESPACE]: { category: categoryMatch.category },
         }),
         mode: filteredModesValues,
-        ...(omitType && { figmaType: variable.resolvedType }),
+        // Mirrors `mode`: only meaningful when a per-mode file is produced
+        ...(includeFigmaMetaData &&
+          Object.keys(filteredModesValues).length > 0 &&
+          Object.keys(modeTargetIds).length > 0 && { modeTargetIds }),
+        // Always present, not only where $type is omitted — the DTCG type is
+        // lossy for numbers (dimension/number/fontWeight/duration all map back
+        // to FLOAT) and consumers should not have to guess the Figma type.
+        figmaType: variable.resolvedType,
         ...(includeFigmaMetaData && {
           figma: {
             codeSyntax: variable.codeSyntax,
             variableId: variable.id,
+            // Stable across files, unlike `id` — the key is how a consuming
+            // file addresses a published library variable
+            key: variable.key,
+            // A hidden variable cannot be imported by key, so consumers must
+            // not offer it as a binding target
+            hiddenFromPublishing: variable.hiddenFromPublishing,
             collection: collectionObject,
+            ...(defaultTargetVariableId && {
+              targetVariableId: defaultTargetVariableId,
+            }),
           },
         }),
       },

@@ -166,12 +166,19 @@ interface PluginTokenI {
   scopes?: VariableScope[];
   $extensions: {
     mode: Object;
+    // Alias target ids per mode name — mirrors `mode`, present only for
+    // multi-mode collections that alias in at least one mode
+    modeTargetIds?: Record<string, string>;
     figmaType?: VariableResolvedDataType;
     'tokens-to-json'?: {
       category?: string;
     };
     figma?: {
       variableId: string;
+      // Publishing identity: stable library key, and whether the variable is
+      // publishable at all — a hidden one cannot be imported by key
+      key: string;
+      hiddenFromPublishing: boolean;
       codeSyntax: {
         WEB?: string;
         iOS?: string;
@@ -182,6 +189,8 @@ interface PluginTokenI {
         name: string;
         defaultModeId: string;
       };
+      // Set when $value is an alias — the raw id of the referenced variable
+      targetVariableId?: string;
     };
   };
 }
@@ -208,6 +217,18 @@ interface MetaPropsI {
   colorMode: colorModeType;
   variableCollections: string[] | undefined;
   createdAt: string;
+  // Identity of the collection and mode this file holds. Only set when the
+  // export is split per collection or per mode, where a file maps to exactly
+  // one of each — the file name is a sanitized mode name, not an identifier.
+  collection?: {
+    id: string;
+    name: string;
+    defaultModeId: string;
+  };
+  mode?: {
+    id: string;
+    name: string;
+  };
 }
 
 interface ToastIPropsI {
