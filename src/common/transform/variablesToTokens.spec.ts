@@ -100,6 +100,27 @@ describe('variablesToTokens DTCG 2025.10 format', () => {
   });
 });
 
+describe('variablesToTokens color values', () => {
+  test('unknown color shape stops the export and names the variable', async () => {
+    const odd = [
+      {
+        name: 'color/odd',
+        resolvedType: 'COLOR',
+        scopes: [],
+        variableCollectionId: 'c1',
+        valuesByMode: { m1: { hue: 10 } },
+        description: '',
+        codeSyntax: {},
+        id: 'v9',
+      },
+    ] as unknown as Variable[];
+
+    await expect(
+      variablesToTokens(odd, collections, { ...baseConfig, useDTCG: true }, resolver)
+    ).rejects.toThrow('color/odd: Unsupported COLOR value shape');
+  });
+});
+
 describe('variablesToTokens token categories', () => {
   const categoriesOn = {
     ...baseConfig,

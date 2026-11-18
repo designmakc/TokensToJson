@@ -20,6 +20,43 @@ interface PropsI {
   refinedCategory?: string;
 }
 
+// Color value made of two parts: a base color and an opacity, each either a
+// reference or a raw value (`{ color: alias | RGBA, opacity: alias | 0-100 }`).
+// Figma's typings do not describe it yet.
+export type ColorWithOpacityT = {
+  color: VariableAlias | RGBA;
+  opacity: VariableAlias | number;
+};
+
+export const isColorWithOpacity = (value: any): value is ColorWithOpacityT =>
+  !!value &&
+  typeof value === 'object' &&
+  'color' in value &&
+  'opacity' in value;
+
+/**
+ * Opacity part of a color-with-opacity value, formatted like an OPACITY
+ * variable: a reference stays a reference, a raw 0-100 number follows
+ * opacityFormat. `undefined` for any other value.
+ */
+export const normalizeColorOpacity = async (
+  props: PropsI,
+  resolver: IResolver
+) => {
+  if (!isColorWithOpacity(props.variableValue)) return undefined;
+  return normalizeValue(
+    {
+      ...props,
+      variableType: 'FLOAT',
+      variableScope: ['OPACITY'],
+      variableValue: props.variableValue.opacity,
+      refinedType: undefined,
+      refinedCategory: undefined,
+    },
+    resolver
+  );
+};
+
 export const normalizeValue = async (props: PropsI, resolver: IResolver) => {
   const {
     variableValue,
@@ -51,6 +88,21 @@ export const normalizeValue = async (props: PropsI, resolver: IResolver) => {
   }
 
   if (variableType === 'COLOR') {
+    // $value carries the base color; the opacity part goes to $extensions
+    // (normalizeColorOpacity)
+    if (isColorWithOpacity(variableValue)) {
+      return normalizeValue(
+        { ...props, variableValue: variableValue.color },
+        resolver
+      );
+    }
+    // An unknown shape must stop the export: converting it would write a
+    // broken color without any warning
+    if (typeof variableValue?.r !== 'number') {
+      throw new Error(
+        `Unsupported COLOR value shape: ${JSON.stringify(variableValue)}`
+      );
+    }
     return convertRGBA(variableValue, colorMode);
   }
 

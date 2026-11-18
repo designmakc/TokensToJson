@@ -1,4 +1,8 @@
-import { normalizeValue } from './normalizeValue';
+import {
+  normalizeValue,
+  normalizeColorOpacity,
+  isColorWithOpacity,
+} from './normalizeValue';
 import { normalizeType, isNonSpecTokenType } from './normalizeType';
 import { getTokenKeyName } from './getTokenKeyName';
 import { PLUGIN_EXTENSION_NAMESPACE } from './extensionNamespace';
@@ -99,7 +103,11 @@ export const variablesToTokens = async (
     // so a reference cannot be resolved without parsing names — which breaks
     // on the first token name containing a dot. The raw ids are unambiguous.
     const aliasTargetId = (modeId: string) => {
-      const modeValue = modes[modeId] as VariableAlias | undefined;
+      const raw = modes[modeId];
+      // A color-with-opacity value aliases through its color part
+      const modeValue = (isColorWithOpacity(raw) ? raw.color : raw) as
+        | VariableAlias
+        | undefined;
       return modeValue?.type === 'VARIABLE_ALIAS' ? modeValue.id : undefined;
     };
     const defaultTargetVariableId = aliasTargetId(collectionDefaultModeId);
@@ -114,26 +122,34 @@ export const variablesToTokens = async (
       }
     }
 
-    const getValue = async (modeIndex: number) =>
-      await normalizeValue(
-        {
-          variableType: variable.resolvedType,
-          variableValue: variable.valuesByMode[Object.keys(modes)[modeIndex]],
-          variableScope: variable.scopes,
-          colorMode,
-          useDTCG,
-          includeValueStringKeyToAlias,
-          opacityFormat,
-          omitCollectionNames,
-          refinedType,
-          refinedCategory: refinedType ? categoryMatch?.category : undefined,
-        },
-        resolver
-      );
+    const valueProps = (modeIndex: number) => ({
+      variableType: variable.resolvedType,
+      variableValue: variable.valuesByMode[Object.keys(modes)[modeIndex]],
+      variableScope: variable.scopes,
+      colorMode,
+      useDTCG,
+      includeValueStringKeyToAlias,
+      opacityFormat,
+      omitCollectionNames,
+      refinedType,
+      refinedCategory: refinedType ? categoryMatch?.category : undefined,
+    });
 
-    const defaultValue = await getValue(
-      Object.keys(modes).indexOf(collectionDefaultModeId)
-    );
+    const getValue = async (modeIndex: number) => {
+      try {
+        return await normalizeValue(valueProps(modeIndex), resolver);
+      } catch (error) {
+        throw new Error(`${variable.name}: ${(error as Error).message}`);
+      }
+    };
+
+    // Opacity part of a color-with-opacity value; undefined for plain values
+    const getOpacity = (modeIndex: number) =>
+      normalizeColorOpacity(valueProps(modeIndex), resolver);
+
+    const defaultModeIndex = Object.keys(modes).indexOf(collectionDefaultModeId);
+    const defaultValue = await getValue(defaultModeIndex);
+    const defaultOpacity = await getOpacity(defaultModeIndex);
 
     // console.log("defaultValue", defaultValue);
 
@@ -157,6 +173,21 @@ export const variablesToTokens = async (
 
     const filteredModesValues =
       Object.keys(modesValues).length === 1 ? {} : modesValues;
+
+    // Per-mode opacity parts, consumed by the mode split like modeTargetIds.
+    // Present only when some mode holds a color-with-opacity value.
+    const modeOpacity: Record<string, string | number> = {};
+    if (Object.keys(filteredModesValues).length > 0) {
+      for (const [index, modeId] of Object.keys(modes).entries()) {
+        const modeName = collection.modes.find(
+          (mode) => mode.modeId === modeId
+        )?.name;
+        const opacity = await getOpacity(index);
+        if (modeName && opacity !== undefined) {
+          modeOpacity[modeName] = opacity;
+        }
+      }
+    }
 
     let tokenType = normalizeType(
       variable.resolvedType,
@@ -192,10 +223,15 @@ export const variablesToTokens = async (
         }),
       // add meta
       $extensions: {
-        ...(categoryMatch && {
-          [PLUGIN_EXTENSION_NAMESPACE]: { category: categoryMatch.category },
+        ...((categoryMatch || defaultOpacity !== undefined) && {
+          [PLUGIN_EXTENSION_NAMESPACE]: {
+            ...(categoryMatch && { category: categoryMatch.category }),
+            // $value is the base color; the color is drawn with this opacity
+            ...(defaultOpacity !== undefined && { opacity: defaultOpacity }),
+          },
         }),
         mode: filteredModesValues,
+        ...(Object.keys(modeOpacity).length > 0 && { modeOpacity }),
         // Mirrors `mode`: only meaningful when a per-mode file is produced
         ...(includeFigmaMetaData &&
           Object.keys(filteredModesValues).length > 0 &&

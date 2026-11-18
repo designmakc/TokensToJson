@@ -169,9 +169,15 @@ interface PluginTokenI {
     // Alias target ids per mode name — mirrors `mode`, present only for
     // multi-mode collections that alias in at least one mode
     modeTargetIds?: Record<string, string>;
+    // Opacity parts of a color-with-opacity value per mode name — mirrors
+    // `mode`, consumed by the mode split
+    modeOpacity?: Record<string, string | number>;
     figmaType?: VariableResolvedDataType;
     'tokens-to-json'?: {
       category?: string;
+      // Color-with-opacity: $value is the base color, drawn with this
+      // opacity (a reference, or a number in opacityFormat)
+      opacity?: string | number;
     };
     figma?: {
       variableId: string;

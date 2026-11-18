@@ -149,6 +149,33 @@ const modeVariables = [
     description: '',
     codeSyntax: {},
   },
+  {
+    id: 'v5',
+    name: 'opacity/0',
+    resolvedType: 'FLOAT',
+    scopes: ['OPACITY'],
+    variableCollectionId: 'c1',
+    valuesByMode: { m1: 0 },
+    description: '',
+    codeSyntax: {},
+  },
+  {
+    id: 'v6',
+    name: 'color/overlay',
+    resolvedType: 'COLOR',
+    scopes: ['ALL_SCOPES'],
+    variableCollectionId: 'c3',
+    // Color-with-opacity: references in one mode, raw parts in the other
+    valuesByMode: {
+      m3: {
+        color: { type: 'VARIABLE_ALIAS', id: 'v0' },
+        opacity: { type: 'VARIABLE_ALIAS', id: 'v5' },
+      },
+      m4: { color: { r: 0, g: 0, b: 0, a: 1 }, opacity: 40 },
+    },
+    description: '',
+    codeSyntax: {},
+  },
 ] as unknown as Variable[];
 
 const modeResolver = {
@@ -198,6 +225,30 @@ describe('getTokens figma metadata', () => {
     expect(dark.$extensions.figma.targetVariableId).toBeUndefined();
     // The per-mode map is consumed by the split, not shipped
     expect(light.$extensions.modeTargetIds).toBeUndefined();
+  });
+
+  test('color-with-opacity: base color in $value, opacity per mode', async () => {
+    const tokens = await getTokens(modeResolver, modeConfig);
+
+    const light = tokens['theme/light'].color.overlay;
+    const dark = tokens['theme/dark'].color.overlay;
+
+    expect(light.$type).toBe('color');
+    expect(light.$value).toBe('{primitive.color.white}');
+    expect(light.$extensions['tokens-to-json'].opacity).toBe(
+      '{primitive.opacity.0}'
+    );
+    expect(light.$extensions.figma.targetVariableId).toBe('v0');
+
+    expect(dark.$value).toBe('#000000');
+    expect(dark.$extensions['tokens-to-json'].opacity).toBe(0.4);
+    expect(dark.$extensions.figma.targetVariableId).toBeUndefined();
+
+    // The per-mode map is consumed by the split, not shipped
+    expect(light.$extensions.modeOpacity).toBeUndefined();
+    // A plain color carries no opacity part
+    expect(tokens['theme/light'].color.bg.$extensions['tokens-to-json'])
+      .toBeUndefined();
   });
 
   test('figmaType is written for every token, not only untyped ones', async () => {

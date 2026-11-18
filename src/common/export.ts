@@ -3,6 +3,7 @@ import { stylesToTokens } from './transform/styles/stylesToTokens';
 import { variablesToTokens } from './transform/variablesToTokens';
 import { mergeStylesIntoTokens } from './transform/mergeStylesIntoTokens';
 import { IResolver } from './resolver';
+import { PLUGIN_EXTENSION_NAMESPACE } from './transform/extensionNamespace';
 
 /**
  * Recursively collect all mode names found in $extensions.mode across a token tree.
@@ -42,11 +43,28 @@ const applyModeToTokens = (
       if ('$value' in value) {
         const modeValue = value.$extensions?.mode?.[modeName];
         const modeTargetId = value.$extensions?.modeTargetIds?.[modeName];
+        const modeOpacity = value.$extensions?.modeOpacity;
         const {
           mode: _mode,
           modeTargetIds: _modeTargetIds,
+          modeOpacity: _modeOpacity,
           ...restExtensions
         } = value.$extensions || {};
+        if (modeOpacity) {
+          // Same rule as the alias target: the opacity part follows the mode,
+          // and a mode without one must not inherit the default's
+          const { opacity: _opacity, ...ownNs } =
+            restExtensions[PLUGIN_EXTENSION_NAMESPACE] || {};
+          const ns =
+            modeOpacity[modeName] !== undefined
+              ? { ...ownNs, opacity: modeOpacity[modeName] }
+              : ownNs;
+          if (Object.keys(ns).length > 0) {
+            restExtensions[PLUGIN_EXTENSION_NAMESPACE] = ns;
+          } else {
+            delete restExtensions[PLUGIN_EXTENSION_NAMESPACE];
+          }
+        }
         if (restExtensions.figma) {
           // Drop the default-mode target before setting this mode's own —
           // a mode may alias where the default holds a raw value, or vice versa
