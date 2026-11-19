@@ -78,14 +78,20 @@ figma.ui.onmessage = async (msg) => {
       new PluginAPIResolver(),
       JSONSettingsConfig,
       JSONSettingsConfig
-    ).then((tokens) => {
-      figma.ui.postMessage({
-        type: 'setTokens',
-        tokens: tokens,
-        role: msg.role,
-        server: msg.server,
-      } as TokensMessageI);
-    });
+    )
+      .then((tokens) => {
+        figma.ui.postMessage({
+          type: 'setTokens',
+          tokens: tokens,
+          role: msg.role,
+          server: msg.server,
+        } as TokensMessageI);
+      })
+      .catch((error) => {
+        // Without this a failed export is silent: the reason sits in the console.
+        figma.notify(error.message, { error: true });
+        throw error;
+      });
   }
 
   // import tokens and create variables

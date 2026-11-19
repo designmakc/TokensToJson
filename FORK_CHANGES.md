@@ -35,12 +35,48 @@
 - solid-цвета: `$extensions.styleId` (как у typography)
 - градиенты: `figmaStyleId` внутри `$extensions['tokens-to-json'].gradient`
 
+### Градиент на сплошной подложке
+
+Стиль из двух слоёв — сплошная заливка снизу, градиент сверху (`paints = [SOLID, GRADIENT_*]`;
+Figma перечисляет слои снизу вверх) — экспортируется как градиент. Раньше такой стиль пропускался
+целиком с warn'ом «unsupported paint combination», и в выгрузке его не было вовсе.
+
+`$value` и `gradient` — как у однослойного градиента; цвет подложки пишется рядом, в
+`$extensions['tokens-to-json'].backgroundColor`:
+
+```json
+"$type": "gradient",
+"$value": [{ "color": "{component.balance-card.gradient.default.start}", "position": 0 }, …],
+"$extensions": {
+  "tokens-to-json": {
+    "gradient": { "kind": "radial", …, "figmaStyleId": "S:…" },
+    "backgroundColor": "{semantic.color.background.interactive.fourth.default}"
+  }
+}
+```
+
+- подложка привязана к переменной → ссылка; не привязана → цвет в выбранном формате с учётом
+  прозрачности слоя
+- скрытая подложка (`visible: false`) ничего не рисует — `backgroundColor` не пишется
+- CSS: `background: <gradient>, <backgroundColor>`; потребитель, который поля не знает, получает
+  тот же градиент без фона под ним
+- юнит-тесты: `colorStylesToTokens.spec.ts`
+
+### Ошибка экспорта видна на экране
+
+Профиль настроек общий для всех файлов. Если `Add styles to` указывает на коллекцию, которой в
+открытом файле нет (или она исключена из экспорта), экспорт раньше падал с
+`Cannot convert undefined or null to object` и ничего не показывал. Теперь `mergeStylesIntoTokens`
+называет коллекцию в сообщении, а контроллер показывает любую ошибку экспорта через `figma.notify`.
+Юнит-тесты: `mergeStylesIntoTokens.spec.ts`.
+
 ### Warn'ы при экспорте (§5.3 брифа)
 
 В `colorStylesToTokens.ts`, только `console.warn`, экспорт не блокируют:
 
 - стиль с несколькими paint'ами — экспортируется первый (GAP-2)
-- стиль с неподдерживаемой комбинацией paint'ов — пропущен (раньше молча исчезал)
+- стиль с неподдерживаемой комбинацией paint'ов — пропущен (раньше молча исчезал); градиент на
+  сплошной подложке к ним не относится, см. выше
 - hardcoded-стоп (без bound variable) в стилях `gradient/*`
 - стоп с alpha=0 (платформы по-разному интерполируют прозрачность)
 - асимметричный linear-градиент (midpoint handles вне центра ±0.01) — CSS `linear-gradient()` не выразит

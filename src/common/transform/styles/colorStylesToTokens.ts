@@ -94,6 +94,43 @@ const convertGradientStopsToDTCG = async (
   return stops;
 };
 
+const isGradientPaint = (paint: Paint) =>
+  paint.type === 'GRADIENT_LINEAR' ||
+  paint.type === 'GRADIENT_RADIAL' ||
+  paint.type === 'GRADIENT_ANGULAR' ||
+  paint.type === 'GRADIENT_DIAMOND';
+
+// The solid layer under a gradient: an alias when the paint is bound to a
+// variable, a raw color (with the paint opacity) otherwise.
+const convertUnderlayColor = async (
+  paint: SolidPaint,
+  colorMode: colorModeType,
+  isDTCGFormat: boolean,
+  includeValueStringKeyToAlias: boolean,
+  resolver: IResolver
+) => {
+  const bound = (paint as any).boundVariables?.color;
+
+  if (bound?.id) {
+    return getAliasVariableName(
+      bound.id,
+      isDTCGFormat,
+      includeValueStringKeyToAlias,
+      resolver
+    );
+  }
+
+  return convertRGBA(
+    {
+      r: paint.color.r,
+      g: paint.color.g,
+      b: paint.color.b,
+      a: paint.opacity !== undefined ? paint.opacity : 1,
+    },
+    colorMode
+  );
+};
+
 export const colorStylesToTokens = async (
   customName: string,
   colorMode: colorModeType,
@@ -118,6 +155,13 @@ export const colorStylesToTokens = async (
     if (paints.length === 0) continue;
 
     const boundVariables = (style as any).boundVariables;
+
+    // Figma lists paints bottom to top, so [SOLID, GRADIENT] is a gradient
+    // over a solid underlay.
+    const hasUnderlay =
+      paints.length === 2 &&
+      paints[0].type === 'SOLID' &&
+      isGradientPaint(paints[1]);
 
     // Handle solid color paints
     if (paints.length === 1 && paints[0].type === 'SOLID') {
@@ -157,15 +201,11 @@ export const colorStylesToTokens = async (
     }
 
     // Handle gradient paints (LINEAR, RADIAL, ANGULAR, DIAMOND)
-    else if (
-      paints[0].type === 'GRADIENT_LINEAR' ||
-      paints[0].type === 'GRADIENT_RADIAL' ||
-      paints[0].type === 'GRADIENT_ANGULAR' ||
-      paints[0].type === 'GRADIENT_DIAMOND'
-    ) {
-      const paint = paints[0] as GradientPaint;
+    else if (isGradientPaint(paints[0]) || hasUnderlay) {
+      const underlay = hasUnderlay ? (paints[0] as SolidPaint) : null;
+      const paint = (underlay ? paints[1] : paints[0]) as GradientPaint;
 
-      if (paints.length > 1) {
+      if (!underlay && paints.length > 1) {
         console.warn(
           `[tokens] Style "${styleName}" has ${paints.length} paints; only the first is exported.`
         );
@@ -182,6 +222,18 @@ export const colorStylesToTokens = async (
       const geometry = getGradientGeometry(paint);
       validateGradientStyle(styleName, paint, geometry);
 
+      // A hidden underlay paints nothing — the style is just the gradient.
+      const backgroundColor =
+        underlay && underlay.visible !== false
+          ? await convertUnderlayColor(
+              underlay,
+              colorMode,
+              isDTCGForamt,
+              includeValueStringKeyToAlias,
+              resolver
+            )
+          : undefined;
+
       const styleObject = {
         [keyNames.type]: 'gradient',
         [keyNames.value]: gradientStops,
@@ -191,6 +243,7 @@ export const colorStylesToTokens = async (
               ...geometry,
               figmaStyleId: style.id,
             },
+            ...(backgroundColor !== undefined && { backgroundColor }),
           },
         },
       };
